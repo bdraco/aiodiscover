@@ -10,16 +10,18 @@ Discover hosts by arp and ptr lookup
 
 ## Features
 
--   Store values and retain the prior value in memory
--   ... some other functionality
+-   Discover hosts on the network via ARP and PTR lookup
 
 ## Quick Start
 
 ```python
-from aiodiscover import Example
+import asyncio
+import pprint
+from aiodiscover import DiscoverHosts
 
-a = Example()
-a.get_value()  # 10
+discover_hosts = DiscoverHosts()
+hosts = asyncio.run(discover_hosts.async_discover())
+pprint.pprint(hosts)
 ```
 
 ## Installation
