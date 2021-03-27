@@ -12,7 +12,7 @@ def load_resolv_conf():
             continue
         if line[0] in ("#", ";"):
             continue
-        key, value = line.split()
+        key, value = line.split(None, 1)
         if key == "nameserver":
             nameservers.add(value)
     return list(nameservers)
