@@ -13,6 +13,7 @@ setup_requirements = [
 ]
 
 test_requirements = [
+    "pytest-asyncio",
     "black>=19.10b0",
     "codecov>=2.1.4",
     "flake8>=3.8.3",
