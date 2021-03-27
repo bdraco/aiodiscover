@@ -1,0 +1,7 @@
+aiodiscover
+===========
+
+.. toctree::
+   :maxdepth: 4
+
+   aiodiscover

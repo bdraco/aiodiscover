@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>aiodiscover.discovery &mdash; Async Host discovery 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Async Host discovery
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../aiodiscover.html">aiodiscover package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.discovery">aiodiscover.discovery module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.network">aiodiscover.network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Async Host discovery</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../aiodiscover.html">aiodiscover</a> &raquo;</li>
+        
+      <li>aiodiscover.discovery</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for aiodiscover.discovery</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
+<span class="kn">from</span> <span class="nn">ipaddress</span> <span class="kn">import</span> <span class="n">ip_address</span><span class="p">,</span> <span class="n">ip_network</span>
+
+<span class="kn">from</span> <span class="nn">async_dns</span> <span class="kn">import</span> <span class="n">DNSMessage</span><span class="p">,</span> <span class="n">types</span>
+<span class="kn">from</span> <span class="nn">async_dns.resolver</span> <span class="kn">import</span> <span class="n">ProxyResolver</span>
+<span class="kn">from</span> <span class="nn">pyroute2</span> <span class="kn">import</span> <span class="n">IPRoute</span>
+
+<span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">SystemNetworkData</span>
+
+<span class="n">HOSTNAME</span> <span class="o">=</span> <span class="s2">&quot;hostname&quot;</span>
+<span class="n">MAC_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;macaddress&quot;</span>
+<span class="n">IP_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;ip&quot;</span>
+
+<span class="n">PING_WIN32</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;ping&quot;</span><span class="p">,</span> <span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;-w&quot;</span><span class="p">,</span> <span class="s2">&quot;1000&quot;</span><span class="p">)</span>
+<span class="n">PING_POSIX</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;ping&quot;</span><span class="p">,</span> <span class="s2">&quot;-b&quot;</span><span class="p">,</span> <span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="s2">&quot;-q&quot;</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;-W1&quot;</span><span class="p">)</span>
+<span class="n">PING_TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="n">IGNORE_NETWORKS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;169.254.0.0/16&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;127.0.0.0/8&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;::1/128&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;::ffff:127.0.0.0/104&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;224.0.0.0/4&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">IGNORE_MACS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;00:00:00:00:00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;ff:ff:ff:ff:ff:ff&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ip_to_ptr"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.ip_to_ptr">[docs]</a><span class="k">def</span> <span class="nf">ip_to_ptr</span><span class="p">(</span><span class="n">ip_address</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert an ip string to a PTR.&quot;&quot;&quot;</span>
+    <span class="n">ipl</span> <span class="o">=</span> <span class="n">ip_address</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="n">ipl</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ipl</span><span class="p">)</span><span class="si">}</span><span class="s2">.in-addr.arpa&quot;</span></div>
+
+
+<div class="viewcode-block" id="async_ping_ip_address"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_ping_ip_address">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">async_ping_ip_address</span><span class="p">(</span><span class="n">ip_address</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Ping an address to generate the arp cache.&quot;&quot;&quot;</span>
+    <span class="n">ping_cmd</span> <span class="o">=</span> <span class="n">PING_WIN32</span> <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span> <span class="k">else</span> <span class="n">PING_POSIX</span>
+    <span class="n">pinger</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_subprocess_exec</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">ping_cmd</span><span class="p">,</span>
+        <span class="n">ip_address</span><span class="p">,</span>
+        <span class="n">stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+        <span class="n">stderr</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">pinger</span><span class="o">.</span><span class="n">communicate</span><span class="p">(),</span> <span class="n">PING_TIMEOUT</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pinger</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+                <span class="k">await</span> <span class="n">pinger</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="k">del</span> <span class="n">pinger</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="get_neighbour_ip_mac"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.get_neighbour_ip_mac">[docs]</a><span class="k">def</span> <span class="nf">get_neighbour_ip_mac</span><span class="p">(</span><span class="n">ip_route</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return all neighbors by ip, mac.&quot;&quot;&quot;</span>
+    <span class="n">neighbours</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="n">ip_route</span><span class="o">.</span><span class="n">get_neighbours</span><span class="p">():</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">mac</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">neighbour</span><span class="p">[</span><span class="s2">&quot;attrs&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;NDA_DST&quot;</span><span class="p">:</span>
+                <span class="n">ip</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;NDA_LLADDR&quot;</span><span class="p">:</span>
+                <span class="n">mac</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">ip</span> <span class="ow">and</span> <span class="n">mac</span><span class="p">:</span>
+            <span class="n">ip_addr</span> <span class="o">=</span> <span class="n">ip_address</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">network</span> <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">IGNORE_NETWORKS</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">mac</span> <span class="ow">in</span> <span class="n">IGNORE_MACS</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">mac</span>
+    <span class="k">return</span> <span class="n">neighbours</span></div>
+
+
+<div class="viewcode-block" id="short_hostname"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.short_hostname">[docs]</a><span class="k">def</span> <span class="nf">short_hostname</span><span class="p">(</span><span class="n">hostname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The first part of the hostname.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">hostname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="DiscoverHosts"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts">[docs]</a><span class="k">class</span> <span class="nc">DiscoverHosts</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Discover hosts on the network by ARP and PTR lookup.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init the discovery hosts.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span> <span class="o">=</span> <span class="n">IPRoute</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DiscoverHosts.async_discover"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts.async_discover">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_discover</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Discover hosts on the network by ARP and PTR lookup.&quot;&quot;&quot;</span>
+        <span class="n">sys_network_data</span> <span class="o">=</span> <span class="n">SystemNetworkData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">)</span>
+        <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">setup</span><span class="p">)</span>
+
+        <span class="n">all_nameservers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sys_network_data</span><span class="o">.</span><span class="n">nameservers</span><span class="p">)</span>
+        <span class="n">router_ip</span> <span class="o">=</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">router_ip</span>
+        <span class="k">if</span> <span class="n">router_ip</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">router_ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_nameservers</span><span class="p">:</span>
+                <span class="n">all_nameservers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">router_ip</span><span class="p">)</span>
+
+        <span class="n">resolver</span> <span class="o">=</span> <span class="n">ProxyResolver</span><span class="p">(</span><span class="n">proxies</span><span class="o">=</span><span class="n">all_nameservers</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">async_ping_ip_address</span><span class="p">(</span><span class="n">sys_network_data</span><span class="o">.</span><span class="n">broadcast_ip</span><span class="p">)</span>
+
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span>
+            <span class="kc">None</span><span class="p">,</span> <span class="n">get_neighbour_ip_mac</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span>
+        <span class="p">)</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">resolver</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">ip_to_ptr</span><span class="p">(</span><span class="n">ip</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">neighbours</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">discovered</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">neighbours</span><span class="p">):</span>
+            <span class="n">mac</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">DNSMessage</span><span class="p">):</span>
+                <span class="n">record</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_record</span><span class="p">((</span><span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">,))</span>
+                <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">hostname</span> <span class="o">=</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+                    <span class="n">discovered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span><span class="n">HOSTNAME</span><span class="p">:</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">MAC_ADDRESS</span><span class="p">:</span> <span class="n">mac</span><span class="p">,</span> <span class="n">IP_ADDRESS</span><span class="p">:</span> <span class="n">ip</span><span class="p">}</span>
+                    <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">discovered</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, J. Nick Koston.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

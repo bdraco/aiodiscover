@@ -1,0 +1,29 @@
+aiodiscover package
+===================
+
+Submodules
+----------
+
+aiodiscover.discovery module
+----------------------------
+
+.. automodule:: aiodiscover.discovery
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+aiodiscover.network module
+--------------------------
+
+.. automodule:: aiodiscover.network
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: aiodiscover
+   :members:
+   :undoc-members:
+   :show-inheritance:
