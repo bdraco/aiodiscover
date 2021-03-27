@@ -8,9 +8,8 @@ __email__ = "nick@koston.org"
 # Details in CONTRIBUTING.md
 __version__ = "1.0.0"
 
+from .discovery import DiscoverHosts  # noqa: F401
+
 
 def get_module_version():
     return __version__
-
-
-from .example import Example  # noqa: F401

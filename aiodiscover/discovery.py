@@ -36,6 +36,7 @@ def ip_to_ptr(ip_address):
 
 
 async def async_ping_ip_address(ip_address):
+    """Ping an address to generate the arp cache."""
     ping_cmd = PING_WIN32 if sys.platform == "win32" else PING_POSIX
     pinger = await asyncio.create_subprocess_exec(
         *ping_cmd,
@@ -57,6 +58,7 @@ async def async_ping_ip_address(ip_address):
 
 
 def get_neighbour_ip_mac(ip_route):
+    """Return all neighbors by ip, mac."""
     neighbours = {}
     for neighbour in ip_route.get_neighbours():
         ip = None
@@ -77,14 +79,19 @@ def get_neighbour_ip_mac(ip_route):
 
 
 def short_hostname(hostname):
+    """The first part of the hostname."""
     return hostname.split(".")[0]
 
 
 class DiscoverHosts:
+    """Discover hosts on the network by ARP and PTR lookup."""
+
     def __init__(self):
+        """Init the discovery hosts."""
         self.ip_route = IPRoute()
 
-    async def async_discover_hosts(self):
+    async def async_discover(self):
+        """Discover hosts on the network by ARP and PTR lookup."""
         sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
