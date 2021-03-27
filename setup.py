@@ -37,7 +37,7 @@ dev_requirements = [
     "wheel>=0.34.2",
 ]
 
-requirements = []
+requirements = ["async_dns", "pyroute2"]
 
 extra_requirements = {
     "setup": setup_requirements,
@@ -46,7 +46,7 @@ extra_requirements = {
     "all": [
         *requirements,
         *dev_requirements,
-    ]
+    ],
 }
 
 setup(
@@ -63,9 +63,7 @@ setup(
     ],
     description="Discover hosts by arp and ptr lookup",
     entry_points={
-        "console_scripts": [
-            "my_example=aiodiscover.bin.my_example:main"
-        ],
+        "console_scripts": ["my_example=aiodiscover.bin.my_example:main"],
     },
     install_requires=requirements,
     license="Apache Software License 2.0",
