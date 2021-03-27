@@ -265,10 +265,8 @@
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span><span class="p">:</span>
-            <span class="c1"># If we do not have pyroute2, assume the router</span>
-            <span class="c1"># is .1</span>
-            <span class="n">network_ip</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="n">network_ip</span></div></div>
+            <span class="c1"># If we do not have working pyroute2, assume the router is .1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network_ip</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">1&quot;</span></div></div>
 </pre></div>
 
            </div>
