@@ -86,7 +86,5 @@ class SystemNetworkData:
             except Exception:
                 pass
         if not self.router_ip:
-            # If we do not have pyroute2, assume the router
-            # is .1
-            network_ip[-1] = "1"
-            self.router_ip = network_ip
+            # If we do not have working pyroute2, assume the router is .1
+            self.router_ip = f"{network_ip[:-1]}1"
