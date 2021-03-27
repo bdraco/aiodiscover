@@ -178,6 +178,8 @@
             
   <h1>Source code for aiodiscover.network</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">ifaddr</span>
+<span class="kn">from</span> <span class="nn">ipaddress</span> <span class="kn">import</span> <span class="n">ip_network</span>
 
 
 <div class="viewcode-block" id="load_resolv_conf"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.load_resolv_conf">[docs]</a><span class="k">def</span> <span class="nf">load_resolv_conf</span><span class="p">():</span>
@@ -209,32 +211,40 @@
         <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_addr_data"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_addr_data">[docs]</a><span class="k">def</span> <span class="nf">get_addr_data</span><span class="p">(</span><span class="n">local_ip</span><span class="p">,</span> <span class="n">ipr</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">addr_data</span> <span class="ow">in</span> <span class="n">ipr</span><span class="o">.</span><span class="n">get_addr</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">addr_data</span><span class="p">[</span><span class="s2">&quot;attrs&quot;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;IFA_ADDRESS&quot;</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">==</span> <span class="n">local_ip</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">addr_data</span></div>
-
-
-<div class="viewcode-block" id="get_broadcast_ip"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_broadcast_ip">[docs]</a><span class="k">def</span> <span class="nf">get_broadcast_ip</span><span class="p">(</span><span class="n">local_ip</span><span class="p">,</span> <span class="n">ipr</span><span class="p">):</span>
-    <span class="n">addr_data</span> <span class="o">=</span> <span class="n">get_addr_data</span><span class="p">(</span><span class="n">local_ip</span><span class="p">,</span> <span class="n">ipr</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">addr_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="get_network_and_broadcast_ip"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_network_and_broadcast_ip">[docs]</a><span class="k">def</span> <span class="nf">get_network_and_broadcast_ip</span><span class="p">(</span><span class="n">local_ip</span><span class="p">,</span> <span class="n">adapters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Search adapters for the network and broadcast ip.&quot;&quot;&quot;</span>
+    <span class="n">network_prefix</span> <span class="o">=</span> <span class="n">get_ip_prefix_from_adapters</span><span class="p">(</span><span class="n">local_ip</span><span class="p">,</span> <span class="n">adapters</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">network_prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">return</span> <span class="n">get_attrs_key</span><span class="p">(</span><span class="n">addr_data</span><span class="p">,</span> <span class="s2">&quot;IFA_BROADCAST&quot;</span><span class="p">)</span></div>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">ip_network</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">local_ip</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">network_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">network_address</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">broadcast_address</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_ip_prefix_from_adapters"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_ip_prefix_from_adapters">[docs]</a><span class="k">def</span> <span class="nf">get_ip_prefix_from_adapters</span><span class="p">(</span><span class="n">local_ip</span><span class="p">,</span> <span class="n">adapters</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find the nework prefix for an adapter.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">adapter</span> <span class="ow">in</span> <span class="n">adapters</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">adapter</span><span class="o">.</span><span class="n">ips</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">local_ip</span> <span class="o">==</span> <span class="n">ip</span><span class="o">.</span><span class="n">ip</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ip</span><span class="o">.</span><span class="n">network_prefix</span></div>
 
 
 <div class="viewcode-block" id="get_attrs_key"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_attrs_key">[docs]</a><span class="k">def</span> <span class="nf">get_attrs_key</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Lookup an attrs key in pyroute2 data.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">attr_key</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;attrs&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">attr_key</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">attr_value</span></div>
 
 
 <div class="viewcode-block" id="get_router_ip"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_router_ip">[docs]</a><span class="k">def</span> <span class="nf">get_router_ip</span><span class="p">(</span><span class="n">ipr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Obtain the router ip from the default route.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_attrs_key</span><span class="p">(</span><span class="n">ipr</span><span class="o">.</span><span class="n">get_default_routes</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;RTA_GATEWAY&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SystemNetworkData"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData">[docs]</a><span class="k">class</span> <span class="nc">SystemNetworkData</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Gather system network data.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip_route</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init system network data.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span> <span class="o">=</span> <span class="n">ip_route</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_ip</span> <span class="o">=</span> <span class="kc">None</span>
@@ -242,13 +252,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nameservers</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SystemNetworkData.setup"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span> <span class="o">=</span> <span class="n">get_local_ip</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_ip</span> <span class="o">=</span> <span class="n">get_broadcast_ip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;Obtain the local network data.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nameservers</span> <span class="o">=</span> <span class="n">load_resolv_conf</span><span class="p">()</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="n">get_router_ip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">pass</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adapters</span> <span class="o">=</span> <span class="n">ifaddr</span><span class="o">.</span><span class="n">get_adapters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span> <span class="o">=</span> <span class="n">get_local_ip</span><span class="p">()</span>
+        <span class="n">network_ip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_ip</span> <span class="o">=</span> <span class="n">get_network_and_broadcast_ip</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapters</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="n">get_router_ip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span><span class="p">:</span>
+            <span class="c1"># If we do not have pyroute2, assume the router</span>
+            <span class="c1"># is .1</span>
+            <span class="n">network_ip</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="n">network_ip</span></div></div>
 </pre></div>
 
            </div>

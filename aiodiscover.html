@@ -241,27 +241,27 @@
 <dt id="aiodiscover.network.SystemNetworkData">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">SystemNetworkData</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_route</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Gather system network data.</p>
+<p>Init system network data.</p>
 <dl class="py method">
 <dt id="aiodiscover.network.SystemNetworkData.setup">
 <code class="sig-name descname"><span class="pre">setup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData.setup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Obtain the local network data.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="aiodiscover.network.get_addr_data">
-<code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_addr_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ipr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_addr_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_addr_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt id="aiodiscover.network.get_attrs_key">
 <code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_attrs_key</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_attrs_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_attrs_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Lookup an attrs key in pyroute2 data.</p>
+</dd></dl>
 
 <dl class="py function">
-<dt id="aiodiscover.network.get_broadcast_ip">
-<code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_broadcast_ip</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ipr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_broadcast_ip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_broadcast_ip" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="aiodiscover.network.get_ip_prefix_from_adapters">
+<code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_ip_prefix_from_adapters</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adapters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_ip_prefix_from_adapters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_ip_prefix_from_adapters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the nework prefix for an adapter.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="aiodiscover.network.get_local_ip">
@@ -270,9 +270,16 @@
 </dd></dl>
 
 <dl class="py function">
+<dt id="aiodiscover.network.get_network_and_broadcast_ip">
+<code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_network_and_broadcast_ip</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adapters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_network_and_broadcast_ip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_network_and_broadcast_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search adapters for the network and broadcast ip.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="aiodiscover.network.get_router_ip">
 <code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_router_ip</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ipr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_router_ip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_router_ip" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Obtain the router ip from the default route.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="aiodiscover.network.load_resolv_conf">
