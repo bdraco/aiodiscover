@@ -10,8 +10,7 @@ Discover hosts by arp and ptr lookup
 
 ## Features
 
--   Store values and retain the prior value in memory
--   ... some other functionality
+-   Discover hosts on the network via ARP and PTR lookup
 
 ## Quick Start
 
