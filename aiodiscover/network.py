@@ -1,4 +1,6 @@
 import socket
+import ifaddr
+from ipaddress import ip_network
 
 
 def load_resolv_conf():
@@ -30,32 +32,40 @@ def get_local_ip():
         s.close()
 
 
-def get_addr_data(local_ip, ipr):
-    for addr_data in ipr.get_addr():
-        for key, value in addr_data["attrs"]:
-            if key == "IFA_ADDRESS" and value == local_ip:
-                return addr_data
-
-
-def get_broadcast_ip(local_ip, ipr):
-    addr_data = get_addr_data(local_ip, ipr)
-    if addr_data is None:
+def get_network_and_broadcast_ip(local_ip, adapters):
+    """Search adapters for the network and broadcast ip."""
+    network_prefix = get_ip_prefix_from_adapters(local_ip, adapters)
+    if network_prefix is None:
         return None
-    return get_attrs_key(addr_data, "IFA_BROADCAST")
+    network = ip_network(f"{local_ip}/{network_prefix}", False)
+    return str(network.network_address), str(network.broadcast_address)
+
+
+def get_ip_prefix_from_adapters(local_ip, adapters):
+    """Find the nework prefix for an adapter."""
+    for adapter in adapters:
+        for ip in adapter.ips:
+            if local_ip == ip.ip:
+                return ip.network_prefix
 
 
 def get_attrs_key(data, key):
+    """Lookup an attrs key in pyroute2 data."""
     for attr_key, attr_value in data["attrs"]:
         if attr_key == key:
             return attr_value
 
 
 def get_router_ip(ipr):
+    """Obtain the router ip from the default route."""
     return get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
 
 
 class SystemNetworkData:
+    """Gather system network data."""
+
     def __init__(self, ip_route):
+        """Init system network data."""
         self.ip_route = ip_route
         self.local_ip = None
         self.broadcast_ip = None
@@ -63,10 +73,20 @@ class SystemNetworkData:
         self.nameservers = None
 
     def setup(self):
-        self.local_ip = get_local_ip()
-        self.broadcast_ip = get_broadcast_ip(self.local_ip, self.ip_route)
+        """Obtain the local network data."""
         self.nameservers = load_resolv_conf()
-        try:
-            self.router_ip = get_router_ip(self.ip_route)
-        except Exception:
-            pass
+        self.adapters = ifaddr.get_adapters()
+        self.local_ip = get_local_ip()
+        network_ip, self.broadcast_ip = get_network_and_broadcast_ip(
+            self.local_ip, self.adapters
+        )
+        if self.ip_route:
+            try:
+                self.router_ip = get_router_ip(self.ip_route)
+            except Exception:
+                pass
+        if not self.router_ip:
+            # If we do not have pyroute2, assume the router
+            # is .1
+            network_ip[-1] = "1"
+            self.router_ip = network_ip

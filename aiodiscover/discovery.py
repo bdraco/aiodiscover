@@ -88,7 +88,9 @@ class DiscoverHosts:
 
     def __init__(self):
         """Init the discovery hosts."""
-        self.ip_route = IPRoute()
+        self.ip_route = None
+        with suppress(Exception):
+            self.ip_route = IPRoute()
 
     async def async_discover(self):
         """Discover hosts on the network by ARP and PTR lookup."""
