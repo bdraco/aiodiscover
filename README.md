@@ -16,10 +16,13 @@ Discover hosts by arp and ptr lookup
 ## Quick Start
 
 ```python
-from aiodiscover import Example
+import asyncio
+import pprint
+from aiodiscover import DiscoverHosts
 
-a = Example()
-a.get_value()  # 10
+discover_hosts = DiscoverHosts()
+hosts = asyncio.run(discover_hosts.async_discover())
+pprint.pprint(hosts)
 ```
 
 ## Installation
