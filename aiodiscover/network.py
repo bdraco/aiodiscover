@@ -148,6 +148,8 @@ class SystemNetworkData:
             if len(data) >= 4:
                 _fill_neighbor(neighbours, data[1].strip("()"), data[3])
 
+        return neighbours
+
     async def _async_get_neighbors_ip_route(self):
         """Get neighbors with pyroute2."""
         neighbours = {}
