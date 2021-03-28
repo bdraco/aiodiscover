@@ -58,13 +58,19 @@ class DiscoverHosts:
         if router_ip not in all_nameservers:
             all_nameservers.insert(0, router_ip)
 
+        ips = [str(ip) for ip in sys_network_data.network.hosts()]
+
         hostnames = {}
         for nameserver in all_nameservers:
             resolver = ProxyResolver(proxies=[nameserver])
-            ips = [str(ip) for ip in sys_network_data.network.hosts()]
-            tasks = [resolver.query(ip_to_ptr(str(ip)), types.PTR) for ip in ips]
             results = await gather_with_concurrency(
-                CONCURRENCY_LIMIT, *tasks, return_exceptions=True
+                CONCURRENCY_LIMIT,
+                *[
+                    resolver.query(ip_to_ptr(str(ip)), types.PTR)
+                    for ip in ips
+                    if ip not in hostnames
+                ],
+                return_exceptions=True,
             )
             for idx, ip in enumerate(ips):
                 if not isinstance(results[idx], DNSMessage):
