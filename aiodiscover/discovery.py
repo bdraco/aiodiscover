@@ -51,28 +51,34 @@ class DiscoverHosts:
             if ip in neighbours
         ]
 
-    async def _async_get_hostnames(self, sys_network_data):
-        """Lookup PTR records for all addresses in the network."""
+    async def _async_get_nameservers(self, sys_network_data):
+        """Get nameservers to query."""
         all_nameservers = list(sys_network_data.nameservers)
         router_ip = sys_network_data.router_ip
         if router_ip not in all_nameservers:
-            all_nameservers.insert(0, router_ip)
+            neighbours = await sys_network_data.async_get_neighbors([router_ip])
+            if router_ip in neighbours:
+                all_nameservers.insert(0, router_ip)
+        return all_nameservers
 
+    async def _async_get_hostnames(self, sys_network_data):
+        """Lookup PTR records for all addresses in the network."""
+        all_nameservers = await self._async_get_nameservers(sys_network_data)
         ips = [str(ip) for ip in sys_network_data.network.hosts()]
 
         hostnames = {}
         for nameserver in all_nameservers:
             resolver = ProxyResolver(proxies=[nameserver])
+            ips_to_lookup = [ip for ip in ips if ip not in hostnames]
             results = await gather_with_concurrency(
                 CONCURRENCY_LIMIT,
                 *[
                     resolver.query(ip_to_ptr(str(ip)), types.PTR)
-                    for ip in ips
-                    if ip not in hostnames
+                    for ip in ips_to_lookup
                 ],
                 return_exceptions=True,
             )
-            for idx, ip in enumerate(ips):
+            for idx, ip in enumerate(ips_to_lookup):
                 if not isinstance(results[idx], DNSMessage):
                     continue
                 record = results[idx].get_record((types.PTR,))
