@@ -112,4 +112,8 @@ class DiscoverHosts:
                 if short_host is None:
                     continue
                 hostnames[ip] = short_host
+            if hostnames:
+                # As soon as we have a responsive nameserver, there
+                # is no need to query additional fallbacks
+                break
         return hostnames
