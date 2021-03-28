@@ -292,6 +292,10 @@
                 <span class="k">if</span> <span class="n">short_host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="n">hostnames</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">short_host</span>
+            <span class="k">if</span> <span class="n">hostnames</span><span class="p">:</span>
+                <span class="c1"># As soon as we have a responsive nameserver, there</span>
+                <span class="c1"># is no need to query additional fallbacks</span>
+                <span class="k">break</span>
         <span class="k">return</span> <span class="n">hostnames</span></div></div>
 </pre></div>
 
