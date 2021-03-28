@@ -39,30 +39,35 @@ class DiscoverHosts:
         sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
-        neighbours = await sys_network_data.async_get_neighbors()
-        discovered = {}
 
         all_nameservers = list(sys_network_data.nameservers)
         router_ip = sys_network_data.router_ip
         if router_ip not in all_nameservers:
             all_nameservers.insert(0, router_ip)
+
+        hostnames = {}
         for nameserver in all_nameservers:
             resolver = ProxyResolver(proxies=[nameserver])
-            tasks = [resolver.query(ip_to_ptr(ip), types.PTR) for ip in neighbours]
+            ips = [str(ip) for ip in sys_network_data.network.hosts()]
+            tasks = [resolver.query(ip_to_ptr(str(ip)), types.PTR) for ip in ips]
             results = await gather_with_concurrency(
                 CONCURRENCY_LIMIT, *tasks, return_exceptions=True
             )
-            for idx, ip in enumerate(neighbours):
-                mac = neighbours[ip]
+            for idx, ip in enumerate(ips):
                 if not isinstance(results[idx], DNSMessage):
                     continue
                 record = results[idx].get_record((types.PTR,))
                 if record is None:
                     continue
-                discovered[mac] = {
-                    HOSTNAME: short_hostname(record),
-                    MAC_ADDRESS: mac,
-                    IP_ADDRESS: ip,
-                }
+                hostnames[ip] = short_hostname(record)
 
-        return list(discovered.values())
+        neighbours = await sys_network_data.async_get_neighbors(hostnames.values())
+        return [
+            {
+                HOSTNAME: hostname,
+                MAC_ADDRESS: neighbours[ip],
+                IP_ADDRESS: ip,
+            }
+            for ip, hostname in hostnames.items()
+            if ip in neighbours
+        ]
