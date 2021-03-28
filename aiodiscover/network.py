@@ -124,15 +124,16 @@ class SystemNetworkData:
     def setup(self):
         """Obtain the local network data."""
         try:
+            resolvers = load_resolv_conf()
+        except FileNotFoundError:
+            if sys.platform != "win32":
+                raise
+        else:
             self.nameservers = [
                 str(ip_addr)
-                for ip_addr in load_resolv_conf()
+                for ip_addr in resolvers
                 if any(ip_addr in network for network in PRIVATE_AND_LOCAL_NETWORKS)
             ]
-        except FileNotFoundError:
-            if sys.platform == "win32":
-                pass
-            raise
 
         self.adapters = ifaddr.get_adapters()
         self.local_ip = get_local_ip()
