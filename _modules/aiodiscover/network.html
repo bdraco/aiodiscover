@@ -313,7 +313,8 @@
         <span class="n">neighbours</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">arp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_subprocess_exec</span><span class="p">(</span>
             <span class="s2">&quot;arp&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;-a&quot;</span> <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
             <span class="n">stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">stdout</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
             <span class="n">stderr</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
