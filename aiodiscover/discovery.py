@@ -73,7 +73,7 @@ class DiscoverHosts:
             results = await gather_with_concurrency(
                 CONCURRENCY_LIMIT,
                 *[
-                    resolver.query(ip_to_ptr(str(ip)), types.PTR)
+                    resolver.query(ip_to_ptr(str(ip)), qtype=types.PTR, timeout=2.0)
                     for ip in ips_to_lookup
                 ],
                 return_exceptions=True,
