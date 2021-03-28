@@ -29,6 +29,28 @@ def short_hostname(hostname):
     return hostname.split(".")[0]
 
 
+def dns_message_short_hostname(dns_message):
+    """Get the short hostname from a dns message."""
+    if not isinstance(dns_message, DNSMessage):
+        return None
+    record = dns_message.get_record((types.PTR,))
+    if record is None:
+        return None
+    return short_hostname(record)
+
+
+async def async_query_for_ptrs(resolver, ips_to_lookup):
+    """Fetch PTR records for a list of ips."""
+    return await gather_with_concurrency(
+        CONCURRENCY_LIMIT,
+        *[
+            resolver.query(ip_to_ptr(str(ip)), qtype=types.PTR, timeout=2.0)
+            for ip in ips_to_lookup
+        ],
+        return_exceptions=True,
+    )
+
+
 class DiscoverHosts:
     """Discover hosts on the network by ARP and PTR lookup."""
 
@@ -43,7 +65,7 @@ class DiscoverHosts:
         sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
-        hostnames = await self._async_get_hostnames(sys_network_data)
+        hostnames = await self.async_get_hostnames(sys_network_data)
         neighbours = await sys_network_data.async_get_neighbors(hostnames.keys())
         return [
             {
@@ -65,7 +87,7 @@ class DiscoverHosts:
                 all_nameservers.insert(0, router_ip)
         return all_nameservers
 
-    async def _async_get_hostnames(self, sys_network_data):
+    async def async_get_hostnames(self, sys_network_data):
         """Lookup PTR records for all addresses in the network."""
         all_nameservers = await self._async_get_nameservers(sys_network_data)
         ips = []
@@ -81,21 +103,13 @@ class DiscoverHosts:
 
         hostnames = {}
         for nameserver in all_nameservers:
-            resolver = ProxyResolver(proxies=[nameserver])
             ips_to_lookup = [ip for ip in ips if ip not in hostnames]
-            results = await gather_with_concurrency(
-                CONCURRENCY_LIMIT,
-                *[
-                    resolver.query(ip_to_ptr(str(ip)), qtype=types.PTR, timeout=2.0)
-                    for ip in ips_to_lookup
-                ],
-                return_exceptions=True,
+            results = await async_query_for_ptrs(
+                ProxyResolver(proxies=[nameserver]), ips_to_lookup
             )
             for idx, ip in enumerate(ips_to_lookup):
-                if not isinstance(results[idx], DNSMessage):
+                short_host = dns_message_short_hostname(results[idx])
+                if short_host is None:
                     continue
-                record = results[idx].get_record((types.PTR,))
-                if record is None:
-                    continue
-                hostnames[ip] = short_hostname(record)
+                hostnames[ip] = short_host
         return hostnames
