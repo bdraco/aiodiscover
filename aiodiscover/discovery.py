@@ -39,7 +39,20 @@ class DiscoverHosts:
         sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
+        hostnames = await self._async_get_hostnames(sys_network_data)
+        neighbours = await sys_network_data.async_get_neighbors(hostnames.values())
+        return [
+            {
+                HOSTNAME: hostname,
+                MAC_ADDRESS: neighbours[ip],
+                IP_ADDRESS: ip,
+            }
+            for ip, hostname in hostnames.items()
+            if ip in neighbours
+        ]
 
+    async def _async_get_hostnames(self, sys_network_data):
+        """Lookup PTR records for all addresses in the network."""
         all_nameservers = list(sys_network_data.nameservers)
         router_ip = sys_network_data.router_ip
         if router_ip not in all_nameservers:
@@ -60,14 +73,4 @@ class DiscoverHosts:
                 if record is None:
                     continue
                 hostnames[ip] = short_hostname(record)
-
-        neighbours = await sys_network_data.async_get_neighbors(hostnames.values())
-        return [
-            {
-                HOSTNAME: hostname,
-                MAC_ADDRESS: neighbours[ip],
-                IP_ADDRESS: ip,
-            }
-            for ip, hostname in hostnames.items()
-            if ip in neighbours
-        ]
+        return hostnames
