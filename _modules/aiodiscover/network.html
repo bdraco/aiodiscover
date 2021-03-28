@@ -304,15 +304,16 @@
 <div class="viewcode-block" id="SystemNetworkData.setup"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Obtain the local network data.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="n">resolvers</span> <span class="o">=</span> <span class="n">load_resolv_conf</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
+                <span class="k">raise</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nameservers</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">ip_addr</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">load_resolv_conf</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">resolvers</span>
                 <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">network</span> <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">PRIVATE_AND_LOCAL_NETWORKS</span><span class="p">)</span>
             <span class="p">]</span>
-        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
-                <span class="k">pass</span>
-            <span class="k">raise</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">adapters</span> <span class="o">=</span> <span class="n">ifaddr</span><span class="o">.</span><span class="n">get_adapters</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span> <span class="o">=</span> <span class="n">get_local_ip</span><span class="p">()</span>
