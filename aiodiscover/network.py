@@ -7,6 +7,8 @@ from ipaddress import ip_address, ip_network
 
 import ifaddr
 
+from .utils import CONCURRENCY_LIMIT, gather_with_concurrency
+
 VALID_MAC_ADDRESS = re.compile(
     "^([0-9A-Fa-f]{2}[:-])"
     + "{5}([0-9A-Fa-f]{2})|"
@@ -66,13 +68,12 @@ def get_local_ip():
         s.close()
 
 
-def get_network_and_broadcast_ip(local_ip, adapters):
+def get_network(local_ip, adapters):
     """Search adapters for the network and broadcast ip."""
     network_prefix = get_ip_prefix_from_adapters(local_ip, adapters)
     if network_prefix is None:
         return None
-    network = ip_network(f"{local_ip}/{network_prefix}", False)
-    return str(network.network_address), str(network.broadcast_address)
+    return ip_network(f"{local_ip}/{network_prefix}", False)
 
 
 def get_ip_prefix_from_adapters(local_ip, adapters):
@@ -110,6 +111,17 @@ def _fill_neighbor(neighbours, ip, mac):
     neighbours[ip] = mac
 
 
+async def async_populate_arp(ip_address):
+    try:
+        _, writer = await asyncio.wait_for(
+            asyncio.open_connection(str(ip_address), 7), 0.05
+        )
+    except (OSError, asyncio.TimeoutError):
+        pass
+    else:
+        writer.close()
+
+
 class SystemNetworkData:
     """Gather system network data."""
 
@@ -137,20 +149,22 @@ class SystemNetworkData:
 
         self.adapters = ifaddr.get_adapters()
         self.local_ip = get_local_ip()
-        network_ip, self.broadcast_ip = get_network_and_broadcast_ip(
-            self.local_ip, self.adapters
-        )
+        self.network = get_network(self.local_ip, self.adapters)
         if self.ip_route:
             try:
                 self.router_ip = get_router_ip(self.ip_route)
             except Exception:
                 pass
         if not self.router_ip:
-            # If we do not have working pyroute2, assume the router is .1
-            self.router_ip = f"{network_ip[:-1]}1"
+            network_address = str(self.network.network_address)
+            self.router_ip = f"{network_address[:-1]}1"
 
     async def async_get_neighbors(self):
         """Get neighbors with best available method."""
+        await gather_with_concurrency(
+            CONCURRENCY_LIMIT, *[async_populate_arp(ip) for ip in self.network.hosts()]
+        )
+
         if self.ip_route:
             return await self._async_get_neighbors_ip_route()
         return await self._async_get_neighbors_arp()

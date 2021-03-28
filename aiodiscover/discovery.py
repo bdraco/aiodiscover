@@ -6,7 +6,7 @@ from async_dns.resolver import ProxyResolver
 from pyroute2 import IPRoute
 
 from .network import SystemNetworkData
-from .ping import async_ping_ip_address
+from .utils import CONCURRENCY_LIMIT, gather_with_concurrency
 
 HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
@@ -39,21 +39,19 @@ class DiscoverHosts:
         sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
+        neighbours = await sys_network_data.async_get_neighbors()
+        discovered = {}
 
         all_nameservers = list(sys_network_data.nameservers)
         router_ip = sys_network_data.router_ip
         if router_ip not in all_nameservers:
             all_nameservers.insert(0, router_ip)
-
-        await async_ping_ip_address(sys_network_data.broadcast_ip)
-
-        neighbours = await sys_network_data.async_get_neighbors()
-        discovered = {}
-
         for nameserver in all_nameservers:
             resolver = ProxyResolver(proxies=[nameserver])
             tasks = [resolver.query(ip_to_ptr(ip), types.PTR) for ip in neighbours]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
+            results = await gather_with_concurrency(
+                CONCURRENCY_LIMIT, *tasks, return_exceptions=True
+            )
             for idx, ip in enumerate(neighbours):
                 mac = neighbours[ip]
                 if not isinstance(results[idx], DNSMessage):
