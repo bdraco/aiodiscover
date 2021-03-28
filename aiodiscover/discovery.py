@@ -40,7 +40,7 @@ class DiscoverHosts:
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
         hostnames = await self._async_get_hostnames(sys_network_data)
-        neighbours = await sys_network_data.async_get_neighbors(hostnames.values())
+        neighbours = await sys_network_data.async_get_neighbors(hostnames.keys())
         return [
             {
                 HOSTNAME: hostname,
