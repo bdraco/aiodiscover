@@ -180,6 +180,7 @@
   <h1>Source code for aiodiscover.discovery</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">from</span> <span class="nn">async_dns</span> <span class="kn">import</span> <span class="n">DNSMessage</span><span class="p">,</span> <span class="n">types</span>
 <span class="kn">from</span> <span class="nn">async_dns.resolver</span> <span class="kn">import</span> <span class="n">ProxyResolver</span>
@@ -191,6 +192,9 @@
 <span class="n">HOSTNAME</span> <span class="o">=</span> <span class="s2">&quot;hostname&quot;</span>
 <span class="n">MAC_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;macaddress&quot;</span>
 <span class="n">IP_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;ip&quot;</span>
+<span class="n">MAX_ADDRESSES</span> <span class="o">=</span> <span class="mi">2048</span>
+
+<span class="n">_LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ip_to_ptr"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.ip_to_ptr">[docs]</a><span class="k">def</span> <span class="nf">ip_to_ptr</span><span class="p">(</span><span class="n">ip_address</span><span class="p">):</span>
@@ -203,6 +207,28 @@
 <div class="viewcode-block" id="short_hostname"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.short_hostname">[docs]</a><span class="k">def</span> <span class="nf">short_hostname</span><span class="p">(</span><span class="n">hostname</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;The first part of the hostname.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">hostname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="dns_message_short_hostname"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.dns_message_short_hostname">[docs]</a><span class="k">def</span> <span class="nf">dns_message_short_hostname</span><span class="p">(</span><span class="n">dns_message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the short hostname from a dns message.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dns_message</span><span class="p">,</span> <span class="n">DNSMessage</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">dns_message</span><span class="o">.</span><span class="n">get_record</span><span class="p">((</span><span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">,))</span>
+    <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="async_query_for_ptrs"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_query_for_ptrs">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">async_query_for_ptrs</span><span class="p">(</span><span class="n">resolver</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fetch PTR records for a list of ips.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="n">gather_with_concurrency</span><span class="p">(</span>
+        <span class="n">CONCURRENCY_LIMIT</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">[</span>
+            <span class="n">resolver</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">ip_to_ptr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)),</span> <span class="n">qtype</span><span class="o">=</span><span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips_to_lookup</span>
+        <span class="p">],</span>
+        <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DiscoverHosts"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts">[docs]</a><span class="k">class</span> <span class="nc">DiscoverHosts</span><span class="p">:</span>
@@ -219,33 +245,54 @@
         <span class="n">sys_network_data</span> <span class="o">=</span> <span class="n">SystemNetworkData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">)</span>
         <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
         <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">setup</span><span class="p">)</span>
-        <span class="n">neighbours</span> <span class="o">=</span> <span class="k">await</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">async_get_neighbors</span><span class="p">()</span>
-        <span class="n">discovered</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">hostnames</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_get_hostnames</span><span class="p">(</span><span class="n">sys_network_data</span><span class="p">)</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="k">await</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">async_get_neighbors</span><span class="p">(</span><span class="n">hostnames</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="n">HOSTNAME</span><span class="p">:</span> <span class="n">hostname</span><span class="p">,</span>
+                <span class="n">MAC_ADDRESS</span><span class="p">:</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">],</span>
+                <span class="n">IP_ADDRESS</span><span class="p">:</span> <span class="n">ip</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">ip</span><span class="p">,</span> <span class="n">hostname</span> <span class="ow">in</span> <span class="n">hostnames</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">neighbours</span>
+        <span class="p">]</span></div>
 
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_nameservers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sys_network_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get nameservers to query.&quot;&quot;&quot;</span>
         <span class="n">all_nameservers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sys_network_data</span><span class="o">.</span><span class="n">nameservers</span><span class="p">)</span>
         <span class="n">router_ip</span> <span class="o">=</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">router_ip</span>
         <span class="k">if</span> <span class="n">router_ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_nameservers</span><span class="p">:</span>
-            <span class="n">all_nameservers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">router_ip</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">nameserver</span> <span class="ow">in</span> <span class="n">all_nameservers</span><span class="p">:</span>
-            <span class="n">resolver</span> <span class="o">=</span> <span class="n">ProxyResolver</span><span class="p">(</span><span class="n">proxies</span><span class="o">=</span><span class="p">[</span><span class="n">nameserver</span><span class="p">])</span>
-            <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">resolver</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">ip_to_ptr</span><span class="p">(</span><span class="n">ip</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">neighbours</span><span class="p">]</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">gather_with_concurrency</span><span class="p">(</span>
-                <span class="n">CONCURRENCY_LIMIT</span><span class="p">,</span> <span class="o">*</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">neighbours</span><span class="p">):</span>
-                <span class="n">mac</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">DNSMessage</span><span class="p">):</span>
-                    <span class="k">continue</span>
-                <span class="n">record</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_record</span><span class="p">((</span><span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">,))</span>
-                <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="n">discovered</span><span class="p">[</span><span class="n">mac</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="n">HOSTNAME</span><span class="p">:</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
-                    <span class="n">MAC_ADDRESS</span><span class="p">:</span> <span class="n">mac</span><span class="p">,</span>
-                    <span class="n">IP_ADDRESS</span><span class="p">:</span> <span class="n">ip</span><span class="p">,</span>
-                <span class="p">}</span>
+            <span class="n">neighbours</span> <span class="o">=</span> <span class="k">await</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">async_get_neighbors</span><span class="p">([</span><span class="n">router_ip</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">router_ip</span> <span class="ow">in</span> <span class="n">neighbours</span><span class="p">:</span>
+                <span class="n">all_nameservers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">router_ip</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">all_nameservers</span>
 
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">discovered</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div></div>
+<div class="viewcode-block" id="DiscoverHosts.async_get_hostnames"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts.async_get_hostnames">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_hostnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sys_network_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lookup PTR records for all addresses in the network.&quot;&quot;&quot;</span>
+        <span class="n">all_nameservers</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_nameservers</span><span class="p">(</span><span class="n">sys_network_data</span><span class="p">)</span>
+        <span class="n">ips</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">hosts</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ips</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">MAX_ADDRESSES</span><span class="p">:</span>
+                <span class="n">_LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Max addresses of </span><span class="si">%s</span><span class="s2"> reached for network: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">MAX_ADDRESSES</span><span class="p">,</span>
+                    <span class="n">sys_network_data</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">break</span>
+            <span class="n">ips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">host</span><span class="p">))</span>
+
+        <span class="n">hostnames</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">nameserver</span> <span class="ow">in</span> <span class="n">all_nameservers</span><span class="p">:</span>
+            <span class="n">ips_to_lookup</span> <span class="o">=</span> <span class="p">[</span><span class="n">ip</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="n">ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hostnames</span><span class="p">]</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_query_for_ptrs</span><span class="p">(</span>
+                <span class="n">ProxyResolver</span><span class="p">(</span><span class="n">proxies</span><span class="o">=</span><span class="p">[</span><span class="n">nameserver</span><span class="p">]),</span> <span class="n">ips_to_lookup</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ips_to_lookup</span><span class="p">):</span>
+                <span class="n">short_host</span> <span class="o">=</span> <span class="n">dns_message_short_hostname</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">short_host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">hostnames</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">short_host</span>
+        <span class="k">return</span> <span class="n">hostnames</span></div></div>
 </pre></div>
 
            </div>

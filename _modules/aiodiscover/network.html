@@ -294,7 +294,7 @@
 <div class="viewcode-block" id="async_populate_arp"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.async_populate_arp">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">async_populate_arp</span><span class="p">(</span><span class="n">ip_address</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
-            <span class="n">asyncio</span><span class="o">.</span><span class="n">open_connection</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip_address</span><span class="p">),</span> <span class="mi">7</span><span class="p">),</span> <span class="mf">0.05</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">open_connection</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip_address</span><span class="p">),</span> <span class="mi">80</span><span class="p">),</span> <span class="mf">0.05</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">):</span>
         <span class="k">pass</span>
@@ -339,15 +339,20 @@
             <span class="n">network_address</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">network_address</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network_address</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">1&quot;</span></div>
 
-<div class="viewcode-block" id="SystemNetworkData.async_get_neighbors"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.async_get_neighbors">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SystemNetworkData.async_get_neighbors"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.async_get_neighbors">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ips</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get neighbors with best available method.&quot;&quot;&quot;</span>
-        <span class="k">await</span> <span class="n">gather_with_concurrency</span><span class="p">(</span>
-            <span class="n">CONCURRENCY_LIMIT</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="n">async_populate_arp</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">hosts</span><span class="p">()]</span>
-        <span class="p">)</span>
+        <span class="n">neighbors</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors</span><span class="p">()</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">async_populate_arp</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="n">ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">tasks</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">gather_with_concurrency</span><span class="p">(</span><span class="n">CONCURRENCY_LIMIT</span><span class="p">,</span> <span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
+            <span class="n">neighbors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">neighbors</span></div>
 
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get neighbors from the arp table.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">:</span>
             <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors_ip_route</span><span class="p">()</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors_arp</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors_arp</span><span class="p">()</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors_arp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get neighbors with arp command.&quot;&quot;&quot;</span>

@@ -209,6 +209,24 @@
 <dd><p>Discover hosts on the network by ARP and PTR lookup.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt id="aiodiscover.discovery.DiscoverHosts.async_get_hostnames">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">async_get_hostnames</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sys_network_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#DiscoverHosts.async_get_hostnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.DiscoverHosts.async_get_hostnames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lookup PTR records for all addresses in the network.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="aiodiscover.discovery.async_query_for_ptrs">
+<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></code><code class="sig-name descname"><span class="pre">async_query_for_ptrs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ips_to_lookup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#async_query_for_ptrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.async_query_for_ptrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch PTR records for a list of ips.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="aiodiscover.discovery.dns_message_short_hostname">
+<code class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></code><code class="sig-name descname"><span class="pre">dns_message_short_hostname</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dns_message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#dns_message_short_hostname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.dns_message_short_hostname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the short hostname from a dns message.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -234,7 +252,7 @@
 <p>Init system network data.</p>
 <dl class="py method">
 <dt id="aiodiscover.network.SystemNetworkData.async_get_neighbors">
-<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">async_get_neighbors</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData.async_get_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData.async_get_neighbors" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">async_get_neighbors</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ips</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData.async_get_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData.async_get_neighbors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get neighbors with best available method.</p>
 </dd></dl>
 
