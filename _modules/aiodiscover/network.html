@@ -99,6 +99,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.discovery">aiodiscover.discovery module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.network">aiodiscover.network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.ping">aiodiscover.ping module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover">Module contents</a></li>
 </ul>
 </li>
@@ -177,9 +178,23 @@
            <div itemprop="articleBody">
             
   <h1>Source code for aiodiscover.network</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">socket</span>
+<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
+<span class="kn">from</span> <span class="nn">ipaddress</span> <span class="kn">import</span> <span class="n">ip_address</span><span class="p">,</span> <span class="n">ip_network</span>
+
 <span class="kn">import</span> <span class="nn">ifaddr</span>
-<span class="kn">from</span> <span class="nn">ipaddress</span> <span class="kn">import</span> <span class="n">ip_network</span>
+
+<span class="n">ARP_TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">IGNORE_NETWORKS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;169.254.0.0/16&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;127.0.0.0/8&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;::1/128&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;::ffff:127.0.0.0/104&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;224.0.0.0/4&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">IGNORE_MACS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;00:00:00:00:00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;ff:ff:ff:ff:ff:ff&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_resolv_conf"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.load_resolv_conf">[docs]</a><span class="k">def</span> <span class="nf">load_resolv_conf</span><span class="p">():</span>
@@ -240,6 +255,19 @@
     <span class="k">return</span> <span class="n">get_attrs_key</span><span class="p">(</span><span class="n">ipr</span><span class="o">.</span><span class="n">get_default_routes</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;RTA_GATEWAY&quot;</span><span class="p">)</span></div>
 
 
+<span class="k">def</span> <span class="nf">_fill_neighbor</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">mac</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add a neighbor if it is valid.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ip_addr</span> <span class="o">=</span> <span class="n">ip_address</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">network</span> <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">IGNORE_NETWORKS</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">mac</span> <span class="ow">in</span> <span class="n">IGNORE_MACS</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">mac</span>
+
+
 <div class="viewcode-block" id="SystemNetworkData"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData">[docs]</a><span class="k">class</span> <span class="nc">SystemNetworkData</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Gather system network data.&quot;&quot;&quot;</span>
 
@@ -266,7 +294,55 @@
                 <span class="k">pass</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span><span class="p">:</span>
             <span class="c1"># If we do not have working pyroute2, assume the router is .1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network_ip</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">1&quot;</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network_ip</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">1&quot;</span></div>
+
+<div class="viewcode-block" id="SystemNetworkData.async_get_neighbors"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.async_get_neighbors">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get neighbors with best available method.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors_ip_route</span><span class="p">()</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors_arp</span><span class="p">()</span></div>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors_arp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get neighbors with arp command.&quot;&quot;&quot;</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">arp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_subprocess_exec</span><span class="p">(</span>
+            <span class="s2">&quot;arp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-a&quot;</span> <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+            <span class="n">stdin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">asyncio</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="n">arp</span><span class="o">.</span><span class="n">communicate</span><span class="p">(),</span> <span class="n">ARP_TIMEOUT</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arp</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+                    <span class="k">await</span> <span class="n">arp</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+                <span class="k">del</span> <span class="n">arp</span>
+            <span class="k">return</span> <span class="n">neighbours</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">neighbours</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out_data</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">_fill_neighbor</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;()&quot;</span><span class="p">),</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors_ip_route</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get neighbors with pyroute2.&quot;&quot;&quot;</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="o">.</span><span class="n">get_neighbours</span><span class="p">():</span>
+            <span class="n">ip</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">mac</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">neighbour</span><span class="p">[</span><span class="s2">&quot;attrs&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;NDA_DST&quot;</span><span class="p">:</span>
+                    <span class="n">ip</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;NDA_LLADDR&quot;</span><span class="p">:</span>
+                    <span class="n">mac</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">if</span> <span class="n">ip</span> <span class="ow">and</span> <span class="n">mac</span><span class="p">:</span>
+                <span class="n">_fill_neighbor</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">mac</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">neighbours</span></div>
 </pre></div>
 
            </div>

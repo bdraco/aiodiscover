@@ -101,6 +101,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover.discovery">aiodiscover.discovery module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover.network">aiodiscover.network module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover.ping">aiodiscover.ping module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover">Module contents</a></li>
 </ul>
 </li>
@@ -211,18 +212,6 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="aiodiscover.discovery.async_ping_ip_address">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></code><code class="sig-name descname"><span class="pre">async_ping_ip_address</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#async_ping_ip_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.async_ping_ip_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ping an address to generate the arp cache.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="aiodiscover.discovery.get_neighbour_ip_mac">
-<code class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></code><code class="sig-name descname"><span class="pre">get_neighbour_ip_mac</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_route</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#get_neighbour_ip_mac"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.get_neighbour_ip_mac" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return all neighbors by ip, mac.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt id="aiodiscover.discovery.ip_to_ptr">
 <code class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></code><code class="sig-name descname"><span class="pre">ip_to_ptr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#ip_to_ptr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.ip_to_ptr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert an ip string to a PTR.</p>
@@ -243,6 +232,12 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Gather system network data.</p>
 <p>Init system network data.</p>
+<dl class="py method">
+<dt id="aiodiscover.network.SystemNetworkData.async_get_neighbors">
+<em class="property"><span class="pre">async</span> </em><code class="sig-name descname"><span class="pre">async_get_neighbors</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData.async_get_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData.async_get_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get neighbors with best available method.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="aiodiscover.network.SystemNetworkData.setup">
 <code class="sig-name descname"><span class="pre">setup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData.setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData.setup" title="Permalink to this definition">¶</a></dt>
@@ -285,6 +280,15 @@
 <dt id="aiodiscover.network.load_resolv_conf">
 <code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">load_resolv_conf</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#load_resolv_conf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.load_resolv_conf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the resolv.conf.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-aiodiscover.ping">
+<span id="aiodiscover-ping-module"></span><h2>aiodiscover.ping module<a class="headerlink" href="#module-aiodiscover.ping" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="aiodiscover.ping.async_ping_ip_address">
+<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">aiodiscover.ping.</span></code><code class="sig-name descname"><span class="pre">async_ping_ip_address</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/ping.html#async_ping_ip_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.ping.async_ping_ip_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ping an address to generate the arp cache.</p>
 </dd></dl>
 
 </div>
