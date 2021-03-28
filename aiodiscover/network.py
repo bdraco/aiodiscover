@@ -1,4 +1,5 @@
 import asyncio
+import sys
 import socket
 from contextlib import suppress
 from ipaddress import ip_address, ip_network
@@ -97,11 +98,16 @@ class SystemNetworkData:
         self.local_ip = None
         self.broadcast_ip = None
         self.router_ip = None
-        self.nameservers = None
+        self.nameservers = []
 
     def setup(self):
         """Obtain the local network data."""
-        self.nameservers = load_resolv_conf()
+        try:
+            self.nameservers = load_resolv_conf()
+        except FileNotFoundError:
+            if sys.platform == "win32":
+                pass
+            raise
         self.adapters = ifaddr.get_adapters()
         self.local_ip = get_local_ip()
         network_ip, self.broadcast_ip = get_network_and_broadcast_ip(
