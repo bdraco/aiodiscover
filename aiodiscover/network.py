@@ -161,9 +161,15 @@ class SystemNetworkData:
 
     async def async_get_neighbors(self, ips):
         """Get neighbors with best available method."""
-        await gather_with_concurrency(
-            CONCURRENCY_LIMIT, *[async_populate_arp(ip) for ip in ips]
-        )
+        neighbors = await self._async_get_neighbors()
+        tasks = [async_populate_arp(ip) for ip in ips if ip not in neighbors]
+        if tasks:
+            await gather_with_concurrency(CONCURRENCY_LIMIT, *tasks)
+            neighbors.update(await self._async_get_neighbors())
+        return neighbors
+
+    async def _async_get_neighbors(self):
+        """Get neighbors from the arp table."""
         if self.ip_route:
             return await self._async_get_neighbors_ip_route()
         return await self._async_get_neighbors_arp()
