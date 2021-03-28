@@ -1,6 +1,20 @@
+import asyncio
 import socket
+from contextlib import suppress
+from ipaddress import ip_address, ip_network
+
 import ifaddr
-from ipaddress import ip_network
+
+ARP_TIMEOUT = 10
+IGNORE_NETWORKS = (
+    ip_network("169.254.0.0/16"),
+    ip_network("127.0.0.0/8"),
+    ip_network("::1/128"),
+    ip_network("::ffff:127.0.0.0/104"),
+    ip_network("224.0.0.0/4"),
+)
+
+IGNORE_MACS = ("00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff")
 
 
 def load_resolv_conf():
@@ -61,6 +75,19 @@ def get_router_ip(ipr):
     return get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
 
 
+def _fill_neighbor(neighbours, ip, mac):
+    """Add a neighbor if it is valid."""
+    try:
+        ip_addr = ip_address(ip)
+    except ValueError:
+        return
+    if any(ip_addr in network for network in IGNORE_NETWORKS):
+        return
+    if mac in IGNORE_MACS:
+        return
+    neighbours[ip] = mac
+
+
 class SystemNetworkData:
     """Gather system network data."""
 
@@ -88,3 +115,51 @@ class SystemNetworkData:
         if not self.router_ip:
             # If we do not have working pyroute2, assume the router is .1
             self.router_ip = f"{network_ip[:-1]}1"
+
+    async def async_get_neighbors(self):
+        """Get neighbors with best available method."""
+        if self.ip_route:
+            return await self._async_get_neighbors_ip_route()
+        return await self._async_get_neighbors_arp()
+
+    async def _async_get_neighbors_arp(self):
+        """Get neighbors with arp command."""
+        neighbours = {}
+        arp = await asyncio.create_subprocess_exec(
+            "arp",
+            "-a" "-n",
+            stdin=None,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        try:
+            out_data, _ = await asyncio.wait_for(arp.communicate(), ARP_TIMEOUT)
+        except asyncio.TimeoutError:
+            if arp:
+                with suppress(TypeError):
+                    await arp.kill()
+                del arp
+            return neighbours
+        except AttributeError:
+            return neighbours
+
+        for line in out_data.splitlines():
+            data = line.strip().split()
+            if len(data) >= 4:
+                _fill_neighbor(neighbours, data[1].strip("()"), data[3])
+
+    async def _async_get_neighbors_ip_route(self):
+        """Get neighbors with pyroute2."""
+        neighbours = {}
+        for neighbour in self.ip_route.get_neighbours():
+            ip = None
+            mac = None
+            for key, value in neighbour["attrs"]:
+                if key == "NDA_DST":
+                    ip = value
+                elif key == "NDA_LLADDR":
+                    mac = value
+            if ip and mac:
+                _fill_neighbor(neighbours, ip, mac)
+
+        return neighbours
