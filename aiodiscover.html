@@ -101,7 +101,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover.discovery">aiodiscover.discovery module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover.network">aiodiscover.network module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover.ping">aiodiscover.ping module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover.utils">aiodiscover.utils module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-aiodiscover">Module contents</a></li>
 </ul>
 </li>
@@ -247,6 +247,11 @@
 </dd></dl>
 
 <dl class="py function">
+<dt id="aiodiscover.network.async_populate_arp">
+<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">async_populate_arp</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#async_populate_arp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.async_populate_arp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="aiodiscover.network.get_attrs_key">
 <code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_attrs_key</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_attrs_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_attrs_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lookup an attrs key in pyroute2 data.</p>
@@ -265,8 +270,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt id="aiodiscover.network.get_network_and_broadcast_ip">
-<code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_network_and_broadcast_ip</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adapters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_network_and_broadcast_ip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_network_and_broadcast_ip" title="Permalink to this definition">¶</a></dt>
+<dt id="aiodiscover.network.get_network">
+<code class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></code><code class="sig-name descname"><span class="pre">get_network</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adapters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#get_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.get_network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Search adapters for the network and broadcast ip.</p>
 </dd></dl>
 
@@ -283,12 +288,13 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-aiodiscover.ping">
-<span id="aiodiscover-ping-module"></span><h2>aiodiscover.ping module<a class="headerlink" href="#module-aiodiscover.ping" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-aiodiscover.utils">
+<span id="aiodiscover-utils-module"></span><h2>aiodiscover.utils module<a class="headerlink" href="#module-aiodiscover.utils" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="aiodiscover.ping.async_ping_ip_address">
-<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">aiodiscover.ping.</span></code><code class="sig-name descname"><span class="pre">async_ping_ip_address</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/ping.html#async_ping_ip_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.ping.async_ping_ip_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ping an address to generate the arp cache.</p>
+<dt id="aiodiscover.utils.gather_with_concurrency">
+<em class="property"><span class="pre">async</span> </em><code class="sig-prename descclassname"><span class="pre">aiodiscover.utils.</span></code><code class="sig-name descname"><span class="pre">gather_with_concurrency</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limit</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">tasks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_exceptions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/utils.html#gather_with_concurrency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.utils.gather_with_concurrency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap asyncio.gather to limit the number of concurrent tasks.</p>
+<p>From: <a class="reference external" href="https://stackoverflow.com/a/61478547/9127614">https://stackoverflow.com/a/61478547/9127614</a></p>
 </dd></dl>
 
 </div>

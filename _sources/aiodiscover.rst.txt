@@ -20,10 +20,10 @@ aiodiscover.network module
    :undoc-members:
    :show-inheritance:
 
-aiodiscover.ping module
------------------------
+aiodiscover.utils module
+------------------------
 
-.. automodule:: aiodiscover.ping
+.. automodule:: aiodiscover.utils
    :members:
    :undoc-members:
    :show-inheritance:
