@@ -42,7 +42,7 @@ class DiscoverHosts:
         await loop.run_in_executor(None, sys_network_data.setup)
         if sys_network_data.network.num_addresses > MAX_ADDRESSES:
             raise ValueError(
-                "The network has too many addreses ({sys_network_data.network.num_addresses})"
+                f"The network ({sys_network_data.network}) has too many addreses ({sys_network_data.network.num_addresses})"
             )
         hostnames = await self._async_get_hostnames(sys_network_data)
         neighbours = await sys_network_data.async_get_neighbors(hostnames.keys())
