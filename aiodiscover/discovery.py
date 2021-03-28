@@ -1,5 +1,6 @@
 import asyncio
 from contextlib import suppress
+import logging
 
 from async_dns import DNSMessage, types
 from async_dns.resolver import ProxyResolver
@@ -12,6 +13,8 @@ HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
 IP_ADDRESS = "ip"
 MAX_ADDRESSES = 4096
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def ip_to_ptr(ip_address):
@@ -40,10 +43,6 @@ class DiscoverHosts:
         sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
-        if sys_network_data.network.num_addresses > MAX_ADDRESSES:
-            raise ValueError(
-                f"The network ({sys_network_data.network}) has too many addreses ({sys_network_data.network.num_addresses})"
-            )
         hostnames = await self._async_get_hostnames(sys_network_data)
         neighbours = await sys_network_data.async_get_neighbors(hostnames.keys())
         return [
@@ -69,7 +68,16 @@ class DiscoverHosts:
     async def _async_get_hostnames(self, sys_network_data):
         """Lookup PTR records for all addresses in the network."""
         all_nameservers = await self._async_get_nameservers(sys_network_data)
-        ips = [str(ip) for ip in sys_network_data.network.hosts()]
+        ips = []
+        for host in sys_network_data.network.hosts():
+            ips.append(str(host))
+            if len(ips) == MAX_ADDRESSES:
+                _LOGGER.warning(
+                    "Max addresses of %s reached for network: %s",
+                    MAX_ADDRESSES,
+                    sys_network_data.network,
+                )
+                break
 
         hostnames = {}
         for nameserver in all_nameservers:
