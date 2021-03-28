@@ -133,7 +133,8 @@ class SystemNetworkData:
         neighbours = {}
         arp = await asyncio.create_subprocess_exec(
             "arp",
-            "-a" "-n",
+            "-a",
+            "-n",
             stdin=None,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
