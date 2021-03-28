@@ -12,7 +12,7 @@ from .utils import CONCURRENCY_LIMIT, gather_with_concurrency
 HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
 IP_ADDRESS = "ip"
-MAX_ADDRESSES = 4096
+MAX_ADDRESSES = 2048
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -70,14 +70,14 @@ class DiscoverHosts:
         all_nameservers = await self._async_get_nameservers(sys_network_data)
         ips = []
         for host in sys_network_data.network.hosts():
-            ips.append(str(host))
-            if len(ips) == MAX_ADDRESSES:
+            if len(ips) > MAX_ADDRESSES:
                 _LOGGER.warning(
                     "Max addresses of %s reached for network: %s",
                     MAX_ADDRESSES,
                     sys_network_data.network,
                 )
                 break
+            ips.append(str(host))
 
         hostnames = {}
         for nameserver in all_nameservers:
