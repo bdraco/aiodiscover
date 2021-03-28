@@ -114,7 +114,7 @@ def _fill_neighbor(neighbours, ip, mac):
 async def async_populate_arp(ip_address):
     try:
         _, writer = await asyncio.wait_for(
-            asyncio.open_connection(str(ip_address), 7), 0.05
+            asyncio.open_connection(str(ip_address), 80), 0.05
         )
     except (OSError, asyncio.TimeoutError):
         pass
@@ -159,12 +159,17 @@ class SystemNetworkData:
             network_address = str(self.network.network_address)
             self.router_ip = f"{network_address[:-1]}1"
 
-    async def async_get_neighbors(self):
+    async def async_get_neighbors(self, ips):
         """Get neighbors with best available method."""
-        await gather_with_concurrency(
-            CONCURRENCY_LIMIT, *[async_populate_arp(ip) for ip in self.network.hosts()]
-        )
+        neighbors = await self._async_get_neighbors()
+        tasks = [async_populate_arp(ip) for ip in ips if ip not in neighbors]
+        if tasks:
+            await gather_with_concurrency(CONCURRENCY_LIMIT, *tasks)
+            neighbors.update(await self._async_get_neighbors())
+        return neighbors
 
+    async def _async_get_neighbors(self):
+        """Get neighbors from the arp table."""
         if self.ip_route:
             return await self._async_get_neighbors_ip_route()
         return await self._async_get_neighbors_arp()

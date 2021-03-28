@@ -1,5 +1,6 @@
 import asyncio
 from contextlib import suppress
+import logging
 
 from async_dns import DNSMessage, types
 from async_dns.resolver import ProxyResolver
@@ -11,6 +12,9 @@ from .utils import CONCURRENCY_LIMIT, gather_with_concurrency
 HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
 IP_ADDRESS = "ip"
+MAX_ADDRESSES = 2048
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def ip_to_ptr(ip_address):
@@ -23,6 +27,28 @@ def ip_to_ptr(ip_address):
 def short_hostname(hostname):
     """The first part of the hostname."""
     return hostname.split(".")[0]
+
+
+def dns_message_short_hostname(dns_message):
+    """Get the short hostname from a dns message."""
+    if not isinstance(dns_message, DNSMessage):
+        return None
+    record = dns_message.get_record((types.PTR,))
+    if record is None:
+        return None
+    return short_hostname(record)
+
+
+async def async_query_for_ptrs(resolver, ips_to_lookup):
+    """Fetch PTR records for a list of ips."""
+    return await gather_with_concurrency(
+        CONCURRENCY_LIMIT,
+        *[
+            resolver.query(ip_to_ptr(str(ip)), qtype=types.PTR, timeout=2.0)
+            for ip in ips_to_lookup
+        ],
+        return_exceptions=True,
+    )
 
 
 class DiscoverHosts:
@@ -39,30 +65,51 @@ class DiscoverHosts:
         sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
-        neighbours = await sys_network_data.async_get_neighbors()
-        discovered = {}
+        hostnames = await self.async_get_hostnames(sys_network_data)
+        neighbours = await sys_network_data.async_get_neighbors(hostnames.keys())
+        return [
+            {
+                HOSTNAME: hostname,
+                MAC_ADDRESS: neighbours[ip],
+                IP_ADDRESS: ip,
+            }
+            for ip, hostname in hostnames.items()
+            if ip in neighbours
+        ]
 
+    async def _async_get_nameservers(self, sys_network_data):
+        """Get nameservers to query."""
         all_nameservers = list(sys_network_data.nameservers)
         router_ip = sys_network_data.router_ip
         if router_ip not in all_nameservers:
-            all_nameservers.insert(0, router_ip)
-        for nameserver in all_nameservers:
-            resolver = ProxyResolver(proxies=[nameserver])
-            tasks = [resolver.query(ip_to_ptr(ip), types.PTR) for ip in neighbours]
-            results = await gather_with_concurrency(
-                CONCURRENCY_LIMIT, *tasks, return_exceptions=True
-            )
-            for idx, ip in enumerate(neighbours):
-                mac = neighbours[ip]
-                if not isinstance(results[idx], DNSMessage):
-                    continue
-                record = results[idx].get_record((types.PTR,))
-                if record is None:
-                    continue
-                discovered[mac] = {
-                    HOSTNAME: short_hostname(record),
-                    MAC_ADDRESS: mac,
-                    IP_ADDRESS: ip,
-                }
+            neighbours = await sys_network_data.async_get_neighbors([router_ip])
+            if router_ip in neighbours:
+                all_nameservers.insert(0, router_ip)
+        return all_nameservers
 
-        return list(discovered.values())
+    async def async_get_hostnames(self, sys_network_data):
+        """Lookup PTR records for all addresses in the network."""
+        all_nameservers = await self._async_get_nameservers(sys_network_data)
+        ips = []
+        for host in sys_network_data.network.hosts():
+            if len(ips) > MAX_ADDRESSES:
+                _LOGGER.warning(
+                    "Max addresses of %s reached for network: %s",
+                    MAX_ADDRESSES,
+                    sys_network_data.network,
+                )
+                break
+            ips.append(str(host))
+
+        hostnames = {}
+        for nameserver in all_nameservers:
+            ips_to_lookup = [ip for ip in ips if ip not in hostnames]
+            results = await async_query_for_ptrs(
+                ProxyResolver(proxies=[nameserver]), ips_to_lookup
+            )
+            for idx, ip in enumerate(ips_to_lookup):
+                short_host = dns_message_short_hostname(results[idx])
+                if short_host is None:
+                    continue
+                hostnames[ip] = short_host
+        return hostnames
