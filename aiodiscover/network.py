@@ -152,8 +152,11 @@ class SystemNetworkData:
 
         for line in out_data.splitlines():
             data = line.strip().split()
-            if len(data) >= 4:
-                _fill_neighbor(neighbours, data[1].strip("()"), data[3])
+            if len(data) < 4:
+                continue
+            ip = data[1].strip("()")
+            mac = data[3]
+            _fill_neighbor(neighbours, ip, mac)
 
         return neighbours
 
