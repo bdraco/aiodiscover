@@ -1,10 +1,19 @@
 import asyncio
-import sys
+import re
 import socket
+import sys
 from contextlib import suppress
 from ipaddress import ip_address, ip_network
 
 import ifaddr
+
+VALID_MAC_ADDRESS = re.compile(
+    "^([0-9A-Fa-f]{2}[:-])"
+    + "{5}([0-9A-Fa-f]{2})|"
+    + "([0-9a-fA-F]{4}\\."
+    + "[0-9a-fA-F]{4}\\."
+    + "[0-9a-fA-F]{4})$"
+)
 
 ARP_TIMEOUT = 10
 IGNORE_NETWORKS = (
@@ -14,6 +23,13 @@ IGNORE_NETWORKS = (
     ip_network("::ffff:127.0.0.0/104"),
     ip_network("224.0.0.0/4"),
 )
+PRIVATE_AND_LOCAL_NETWORKS = (
+    ip_network("127.0.0.0/8"),
+    ip_network("10.0.0.0/8"),
+    ip_network("172.16.0.0/12"),
+    ip_network("192.168.0.0/16"),
+)
+
 
 IGNORE_MACS = ("00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff")
 
@@ -31,7 +47,10 @@ def load_resolv_conf():
             continue
         key, value = line.split(None, 1)
         if key == "nameserver":
-            nameservers.add(value)
+            try:
+                nameservers.add(ip_address(value))
+            except ValueError:
+                continue
     return list(nameservers)
 
 
@@ -84,6 +103,8 @@ def _fill_neighbor(neighbours, ip, mac):
         return
     if any(ip_addr in network for network in IGNORE_NETWORKS):
         return
+    if not VALID_MAC_ADDRESS.match(mac):
+        return
     if mac in IGNORE_MACS:
         return
     neighbours[ip] = mac
@@ -103,11 +124,16 @@ class SystemNetworkData:
     def setup(self):
         """Obtain the local network data."""
         try:
-            self.nameservers = load_resolv_conf()
+            self.nameservers = [
+                str(ip_addr)
+                for ip_addr in load_resolv_conf()
+                if any(ip_addr in network for network in PRIVATE_AND_LOCAL_NETWORKS)
+            ]
         except FileNotFoundError:
             if sys.platform == "win32":
                 pass
             raise
+
         self.adapters = ifaddr.get_adapters()
         self.local_ip = get_local_ip()
         network_ip, self.broadcast_ip = get_network_and_broadcast_ip(
@@ -150,8 +176,9 @@ class SystemNetworkData:
         except AttributeError:
             return neighbours
 
-        for line in out_data.splitlines():
-            data = line.strip().split()
+        for line in out_data.decode().splitlines():
+            chomped = line.strip()
+            data = chomped.split()
             if len(data) < 4:
                 continue
             ip = data[1].strip("()")

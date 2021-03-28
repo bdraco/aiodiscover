@@ -45,24 +45,26 @@ class DiscoverHosts:
         if router_ip not in all_nameservers:
             all_nameservers.insert(0, router_ip)
 
-        resolver = ProxyResolver(proxies=all_nameservers)
         await async_ping_ip_address(sys_network_data.broadcast_ip)
 
         neighbours = await sys_network_data.async_get_neighbors()
-        tasks = [resolver.query(ip_to_ptr(ip), types.PTR) for ip in neighbours]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        discovered = []
-        for idx, ip in enumerate(neighbours):
-            mac = neighbours[ip]
-            if isinstance(results[idx], DNSMessage):
-                record = results[idx].get_record((types.PTR,))
-                if record is not None:
-                    discovered.append(
-                        {
-                            HOSTNAME: short_hostname(record),
-                            MAC_ADDRESS: mac,
-                            IP_ADDRESS: ip,
-                        }
-                    )
+        discovered = {}
 
-        return discovered
+        for nameserver in all_nameservers:
+            resolver = ProxyResolver(proxies=[nameserver])
+            tasks = [resolver.query(ip_to_ptr(ip), types.PTR) for ip in neighbours]
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for idx, ip in enumerate(neighbours):
+                mac = neighbours[ip]
+                if not isinstance(results[idx], DNSMessage):
+                    continue
+                record = results[idx].get_record((types.PTR,))
+                if record is None:
+                    continue
+                discovered[mac] = {
+                    HOSTNAME: short_hostname(record),
+                    MAC_ADDRESS: mac,
+                    IP_ADDRESS: ip,
+                }
+
+        return list(discovered.values())
