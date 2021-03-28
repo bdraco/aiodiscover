@@ -225,27 +225,29 @@
         <span class="k">if</span> <span class="n">router_ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_nameservers</span><span class="p">:</span>
             <span class="n">all_nameservers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">router_ip</span><span class="p">)</span>
 
-        <span class="n">resolver</span> <span class="o">=</span> <span class="n">ProxyResolver</span><span class="p">(</span><span class="n">proxies</span><span class="o">=</span><span class="n">all_nameservers</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">async_ping_ip_address</span><span class="p">(</span><span class="n">sys_network_data</span><span class="o">.</span><span class="n">broadcast_ip</span><span class="p">)</span>
 
         <span class="n">neighbours</span> <span class="o">=</span> <span class="k">await</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">async_get_neighbors</span><span class="p">()</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">resolver</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">ip_to_ptr</span><span class="p">(</span><span class="n">ip</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">neighbours</span><span class="p">]</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">discovered</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">neighbours</span><span class="p">):</span>
-            <span class="n">mac</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">DNSMessage</span><span class="p">):</span>
-                <span class="n">record</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_record</span><span class="p">((</span><span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">,))</span>
-                <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">discovered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="p">{</span>
-                            <span class="n">HOSTNAME</span><span class="p">:</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
-                            <span class="n">MAC_ADDRESS</span><span class="p">:</span> <span class="n">mac</span><span class="p">,</span>
-                            <span class="n">IP_ADDRESS</span><span class="p">:</span> <span class="n">ip</span><span class="p">,</span>
-                        <span class="p">}</span>
-                    <span class="p">)</span>
+        <span class="n">discovered</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="k">return</span> <span class="n">discovered</span></div></div>
+        <span class="k">for</span> <span class="n">nameserver</span> <span class="ow">in</span> <span class="n">all_nameservers</span><span class="p">:</span>
+            <span class="n">resolver</span> <span class="o">=</span> <span class="n">ProxyResolver</span><span class="p">(</span><span class="n">proxies</span><span class="o">=</span><span class="p">[</span><span class="n">nameserver</span><span class="p">])</span>
+            <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">resolver</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">ip_to_ptr</span><span class="p">(</span><span class="n">ip</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">neighbours</span><span class="p">]</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">neighbours</span><span class="p">):</span>
+                <span class="n">mac</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">DNSMessage</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">record</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">get_record</span><span class="p">((</span><span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">,))</span>
+                <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">discovered</span><span class="p">[</span><span class="n">mac</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">HOSTNAME</span><span class="p">:</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+                    <span class="n">MAC_ADDRESS</span><span class="p">:</span> <span class="n">mac</span><span class="p">,</span>
+                    <span class="n">IP_ADDRESS</span><span class="p">:</span> <span class="n">ip</span><span class="p">,</span>
+                <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">discovered</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div></div>
 </pre></div>
 
            </div>

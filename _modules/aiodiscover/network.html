@@ -179,12 +179,21 @@
             
   <h1>Source code for aiodiscover.network</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
 <span class="kn">from</span> <span class="nn">ipaddress</span> <span class="kn">import</span> <span class="n">ip_address</span><span class="p">,</span> <span class="n">ip_network</span>
 
 <span class="kn">import</span> <span class="nn">ifaddr</span>
+
+<span class="n">VALID_MAC_ADDRESS</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="s2">&quot;^([0-9A-Fa-f]</span><span class="si">{2}</span><span class="s2">[:-])&quot;</span>
+    <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{5}</span><span class="s2">([0-9A-Fa-f]</span><span class="si">{2}</span><span class="s2">)|&quot;</span>
+    <span class="o">+</span> <span class="s2">&quot;([0-9a-fA-F]</span><span class="si">{4}</span><span class="se">\\</span><span class="s2">.&quot;</span>
+    <span class="o">+</span> <span class="s2">&quot;[0-9a-fA-F]</span><span class="si">{4}</span><span class="se">\\</span><span class="s2">.&quot;</span>
+    <span class="o">+</span> <span class="s2">&quot;[0-9a-fA-F]</span><span class="si">{4}</span><span class="s2">)$&quot;</span>
+<span class="p">)</span>
 
 <span class="n">ARP_TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">IGNORE_NETWORKS</span> <span class="o">=</span> <span class="p">(</span>
@@ -194,6 +203,13 @@
     <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;::ffff:127.0.0.0/104&quot;</span><span class="p">),</span>
     <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;224.0.0.0/4&quot;</span><span class="p">),</span>
 <span class="p">)</span>
+<span class="n">PRIVATE_AND_LOCAL_NETWORKS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;127.0.0.0/8&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;10.0.0.0/8&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;172.16.0.0/12&quot;</span><span class="p">),</span>
+    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;192.168.0.0/16&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+
 
 <span class="n">IGNORE_MACS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;00:00:00:00:00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;ff:ff:ff:ff:ff:ff&quot;</span><span class="p">)</span>
 
@@ -211,7 +227,10 @@
             <span class="k">continue</span>
         <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;nameserver&quot;</span><span class="p">:</span>
-            <span class="n">nameservers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">nameservers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ip_address</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">continue</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">nameservers</span><span class="p">)</span></div>
 
 
@@ -264,6 +283,8 @@
         <span class="k">return</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">network</span> <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">IGNORE_NETWORKS</span><span class="p">):</span>
         <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">VALID_MAC_ADDRESS</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">mac</span><span class="p">):</span>
+        <span class="k">return</span>
     <span class="k">if</span> <span class="n">mac</span> <span class="ow">in</span> <span class="n">IGNORE_MACS</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">mac</span>
@@ -283,11 +304,16 @@
 <div class="viewcode-block" id="SystemNetworkData.setup"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Obtain the local network data.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">nameservers</span> <span class="o">=</span> <span class="n">load_resolv_conf</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nameservers</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">ip_addr</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">load_resolv_conf</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">network</span> <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">PRIVATE_AND_LOCAL_NETWORKS</span><span class="p">)</span>
+            <span class="p">]</span>
         <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
                 <span class="k">pass</span>
             <span class="k">raise</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">adapters</span> <span class="o">=</span> <span class="n">ifaddr</span><span class="o">.</span><span class="n">get_adapters</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span> <span class="o">=</span> <span class="n">get_local_ip</span><span class="p">()</span>
         <span class="n">network_ip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_ip</span> <span class="o">=</span> <span class="n">get_network_and_broadcast_ip</span><span class="p">(</span>
@@ -330,8 +356,9 @@
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">neighbours</span>
 
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out_data</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out_data</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="n">chomped</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">chomped</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">ip</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;()&quot;</span><span class="p">)</span>
