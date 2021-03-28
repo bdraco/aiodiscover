@@ -1,6 +1,6 @@
 import asyncio
 
-CONCURRENCY_LIMIT = 10
+CONCURRENCY_LIMIT = 16
 
 
 async def gather_with_concurrency(limit, *tasks, return_exceptions=False):
