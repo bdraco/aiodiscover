@@ -187,16 +187,11 @@
 
 <span class="kn">import</span> <span class="nn">ifaddr</span>
 
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">CONCURRENCY_LIMIT</span><span class="p">,</span> <span class="n">gather_with_concurrency</span>
+<span class="c1"># Some MAC addresses will drop the leading zero so</span>
+<span class="c1"># our mac validation must allow a single char</span>
+<span class="n">VALID_MAC_ADDRESS</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;^([0-9A-Fa-f]{1,2}[:-])</span><span class="si">{5}</span><span class="s2">([0-9A-Fa-f]{1,2})$&quot;</span><span class="p">)</span>
 
-<span class="n">VALID_MAC_ADDRESS</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-    <span class="s2">&quot;^([0-9A-Fa-f]</span><span class="si">{2}</span><span class="s2">[:-])&quot;</span>
-    <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{5}</span><span class="s2">([0-9A-Fa-f]</span><span class="si">{2}</span><span class="s2">)|&quot;</span>
-    <span class="o">+</span> <span class="s2">&quot;([0-9a-fA-F]</span><span class="si">{4}</span><span class="se">\\</span><span class="s2">.&quot;</span>
-    <span class="o">+</span> <span class="s2">&quot;[0-9a-fA-F]</span><span class="si">{4}</span><span class="se">\\</span><span class="s2">.&quot;</span>
-    <span class="o">+</span> <span class="s2">&quot;[0-9a-fA-F]</span><span class="si">{4}</span><span class="s2">)$&quot;</span>
-<span class="p">)</span>
-
+<span class="n">ARP_CACHE_POPULATE_TIME</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">ARP_TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">IGNORE_NETWORKS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;169.254.0.0/16&quot;</span><span class="p">),</span>
@@ -291,15 +286,16 @@
     <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">mac</span>
 
 
-<div class="viewcode-block" id="async_populate_arp"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.async_populate_arp">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">async_populate_arp</span><span class="p">(</span><span class="n">ip_address</span><span class="p">):</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
-            <span class="n">asyncio</span><span class="o">.</span><span class="n">open_connection</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip_address</span><span class="p">),</span> <span class="mi">80</span><span class="p">),</span> <span class="mf">0.05</span>
-        <span class="p">)</span>
-    <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">):</span>
-        <span class="k">pass</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+<div class="viewcode-block" id="async_populate_arp"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.async_populate_arp">[docs]</a><span class="k">def</span> <span class="nf">async_populate_arp</span><span class="p">(</span><span class="n">ip_addresses</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Send an empty packet to a host to populate the arp cache.&quot;&quot;&quot;</span>
+    <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">ip_addresses</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">ip_addr</span><span class="p">,</span> <span class="mi">80</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">sock</span></div>
 
 
 <div class="viewcode-block" id="SystemNetworkData"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData">[docs]</a><span class="k">class</span> <span class="nc">SystemNetworkData</span><span class="p">:</span>
@@ -342,10 +338,13 @@
 <div class="viewcode-block" id="SystemNetworkData.async_get_neighbors"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.async_get_neighbors">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ips</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get neighbors with best available method.&quot;&quot;&quot;</span>
         <span class="n">neighbors</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors</span><span class="p">()</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">async_populate_arp</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="n">ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">tasks</span><span class="p">:</span>
-            <span class="k">await</span> <span class="n">gather_with_concurrency</span><span class="p">(</span><span class="n">CONCURRENCY_LIMIT</span><span class="p">,</span> <span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
-            <span class="n">neighbors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors</span><span class="p">())</span>
+        <span class="n">ips_missing_arp</span> <span class="o">=</span> <span class="p">[</span><span class="n">ip</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="n">ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ips_missing_arp</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">neighbors</span>
+        <span class="n">sock</span> <span class="o">=</span> <span class="n">async_populate_arp</span><span class="p">(</span><span class="n">ips_missing_arp</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">ARP_CACHE_POPULATE_TIME</span><span class="p">)</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">neighbors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">neighbors</span></div>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -390,7 +389,11 @@
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors_ip_route</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get neighbors with pyroute2.&quot;&quot;&quot;</span>
         <span class="n">neighbours</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="o">.</span><span class="n">get_neighbours</span><span class="p">():</span>
+        <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
+        <span class="c1"># This shouldn&#39;t ever block but it does</span>
+        <span class="c1"># interact with netlink so its safer to run</span>
+        <span class="c1"># in the executor</span>
+        <span class="k">for</span> <span class="n">neighbour</span> <span class="ow">in</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="o">.</span><span class="n">get_neighbours</span><span class="p">):</span>
             <span class="n">ip</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">mac</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">neighbour</span><span class="p">[</span><span class="s2">&quot;attrs&quot;</span><span class="p">]:</span>
