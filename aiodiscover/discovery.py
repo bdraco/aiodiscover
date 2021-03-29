@@ -2,17 +2,26 @@ import asyncio
 from contextlib import suppress
 import logging
 
-from async_dns import DNSMessage, types
-from async_dns.resolver import ProxyResolver
+from async_dns.core import (
+    RandId,
+    DNSMessage,
+    types,
+    REQUEST,
+    Record,
+)
+
 from pyroute2 import IPRoute
 
 from .network import SystemNetworkData
-from .utils import CONCURRENCY_LIMIT, gather_with_concurrency
 
 HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
 IP_ADDRESS = "ip"
 MAX_ADDRESSES = 2048
+
+DNS_RESPONSE_TIMEOUT = 2
+MAX_DNS_TIMEOUT_DECLARE_DEAD_NAMESERVER = 5
+DNS_PORT = 53
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,16 +48,64 @@ def dns_message_short_hostname(dns_message):
     return short_hostname(record)
 
 
-async def async_query_for_ptrs(resolver, ips_to_lookup):
+class PTRResolver:
+    """Implement DNS PTR resolver."""
+
+    def __init__(self, destination):
+        """Init protocol for a destination."""
+        self.destination = destination
+        self.responses = {}
+        self.send_qid = None
+        self.responded = asyncio.Event()
+
+    def connection_made(self, transport):
+        """Connection made."""
+        self.transport = transport
+
+    def datagram_received(self, data, addr):
+        """Response recieved."""
+        if addr != self.destination:
+            return
+        msg = DNSMessage.parse(data)
+        self.responses[msg.qid] = msg
+        if msg.qid == self.send_qid:
+            self.responded.set()
+
+    async def send_query(self, query):
+        """Send a query and wait for a response."""
+        self.responded.clear()
+        self.send_qid = query.qid
+        self.transport.sendto(query.pack(), self.destination)
+        await self.responded.wait()
+
+
+async def async_query_for_ptrs(nameserver, ips_to_lookup):
     """Fetch PTR records for a list of ips."""
-    return await gather_with_concurrency(
-        CONCURRENCY_LIMIT,
-        *[
-            resolver.query(ip_to_ptr(str(ip)), qtype=types.PTR, timeout=2.0)
-            for ip in ips_to_lookup
-        ],
-        return_exceptions=True,
+    destination = (nameserver, DNS_PORT)
+    rand_id = RandId()
+    loop = asyncio.get_running_loop()
+    query_for_ip = {}
+
+    transport, protocol = await loop.create_datagram_endpoint(
+        lambda: PTRResolver(destination), remote_addr=destination
     )
+    time_outs = 0
+    for ip in ips_to_lookup:
+        req = DNSMessage(qr=REQUEST)
+        req.qd = [Record(REQUEST, ip_to_ptr(str(ip)), types.PTR)]
+        req.qid = rand_id.get()
+        rand_id.put(req.qid)
+        query_for_ip[ip] = req.qid
+        try:
+            await asyncio.wait_for(
+                protocol.send_query(req), timeout=DNS_RESPONSE_TIMEOUT
+            )
+        except asyncio.TimeoutError:
+            time_outs += 1
+            if time_outs == MAX_DNS_TIMEOUT_DECLARE_DEAD_NAMESERVER:
+                break
+
+    return [protocol.responses.get(query_for_ip.get(ip)) for ip in ips_to_lookup]
 
 
 class DiscoverHosts:
@@ -104,9 +161,7 @@ class DiscoverHosts:
         hostnames = {}
         for nameserver in all_nameservers:
             ips_to_lookup = [ip for ip in ips if ip not in hostnames]
-            results = await async_query_for_ptrs(
-                ProxyResolver(proxies=[nameserver]), ips_to_lookup
-            )
+            results = await async_query_for_ptrs(nameserver, ips_to_lookup)
             for idx, ip in enumerate(ips_to_lookup):
                 short_host = dns_message_short_hostname(results[idx])
                 if short_host is None:
