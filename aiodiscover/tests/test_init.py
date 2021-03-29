@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from aiodiscover import get_module_version
+import aiodiscover
 
 
-async def test_get_module_version():
+def test_get_module_version():
     """Verify get_module_version does not throw."""
-    assert isinstance(get_module_version(), str)
+    assert aiodiscover.get_module_version() == aiodiscover.__version__
