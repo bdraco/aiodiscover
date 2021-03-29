@@ -7,16 +7,11 @@ from ipaddress import ip_address, ip_network
 
 import ifaddr
 
-from .utils import CONCURRENCY_LIMIT, gather_with_concurrency
+# Some MAC addresses will drop the leading zero so
+# our mac validation must allow a single char
+VALID_MAC_ADDRESS = re.compile("^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$")
 
-VALID_MAC_ADDRESS = re.compile(
-    "^([0-9A-Fa-f]{2}[:-])"
-    + "{5}([0-9A-Fa-f]{2})|"
-    + "([0-9a-fA-F]{4}\\."
-    + "[0-9a-fA-F]{4}\\."
-    + "[0-9a-fA-F]{4})$"
-)
-
+ARP_CACHE_POPULATE_TIME = 10
 ARP_TIMEOUT = 10
 IGNORE_NETWORKS = (
     ip_network("169.254.0.0/16"),
@@ -111,15 +106,16 @@ def _fill_neighbor(neighbours, ip, mac):
     neighbours[ip] = mac
 
 
-async def async_populate_arp(ip_address):
-    try:
-        _, writer = await asyncio.wait_for(
-            asyncio.open_connection(str(ip_address), 80), 0.05
-        )
-    except (OSError, asyncio.TimeoutError):
-        pass
-    else:
-        writer.close()
+def async_populate_arp(ip_addresses):
+    """Send an empty packet to a host to populate the arp cache."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
+    sock.setblocking(False)
+    for ip_addr in ip_addresses:
+        try:
+            sock.sendto(b"", (ip_addr, 80))
+        except Exception:
+            pass
+    return sock
 
 
 class SystemNetworkData:
@@ -162,10 +158,13 @@ class SystemNetworkData:
     async def async_get_neighbors(self, ips):
         """Get neighbors with best available method."""
         neighbors = await self._async_get_neighbors()
-        tasks = [async_populate_arp(ip) for ip in ips if ip not in neighbors]
-        if tasks:
-            await gather_with_concurrency(CONCURRENCY_LIMIT, *tasks)
-            neighbors.update(await self._async_get_neighbors())
+        ips_missing_arp = [ip for ip in ips if ip not in neighbors]
+        if not ips_missing_arp:
+            return neighbors
+        sock = async_populate_arp(ips_missing_arp)
+        await asyncio.sleep(ARP_CACHE_POPULATE_TIME)
+        sock.close()
+        neighbors.update(await self._async_get_neighbors())
         return neighbors
 
     async def _async_get_neighbors(self):
@@ -210,7 +209,11 @@ class SystemNetworkData:
     async def _async_get_neighbors_ip_route(self):
         """Get neighbors with pyroute2."""
         neighbours = {}
-        for neighbour in self.ip_route.get_neighbours():
+        loop = asyncio.get_running_loop()
+        # This shouldn't ever block but it does
+        # interact with netlink so its safer to run
+        # in the executor
+        for neighbour in await loop.run_in_executor(None, self.ip_route.get_neighbours):
             ip = None
             mac = None
             for key, value in neighbour["attrs"]:
