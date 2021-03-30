@@ -20,14 +20,6 @@ aiodiscover.network module
    :undoc-members:
    :show-inheritance:
 
-aiodiscover.utils module
-------------------------
-
-.. automodule:: aiodiscover.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
