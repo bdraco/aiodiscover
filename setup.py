@@ -82,6 +82,6 @@ setup(
     url="https://github.com/bdraco/aiodiscover",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="1.3.1",
+    version="1.3.2",
     zip_safe=False,
 )
