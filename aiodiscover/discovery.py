@@ -58,6 +58,9 @@ class PTRResolver:
         self.send_qid = None
         self.responded = asyncio.Event()
 
+    def connection_lost(self, transport):
+        """Connection lost."""
+
     def connection_made(self, transport):
         """Connection made."""
         self.transport = transport
@@ -82,14 +85,22 @@ class PTRResolver:
 async def async_query_for_ptrs(nameserver, ips_to_lookup):
     """Fetch PTR records for a list of ips."""
     destination = (nameserver, DNS_PORT)
-    rand_id = RandId()
     loop = asyncio.get_running_loop()
-    query_for_ip = {}
 
     transport, protocol = await loop.create_datagram_endpoint(
         lambda: PTRResolver(destination), remote_addr=destination
     )
+    try:
+        return await _async_query_for_ptrs(protocol, ips_to_lookup)
+    finally:
+        transport.close()
+
+
+async def _async_query_for_ptrs(protocol, ips_to_lookup):
+    """Send and receiver the PTR queries."""
     time_outs = 0
+    query_for_ip = {}
+    rand_id = RandId()
     for ip in ips_to_lookup:
         req = DNSMessage(qr=REQUEST)
         req.qd = [Record(REQUEST, ip_to_ptr(str(ip)), types.PTR)]
