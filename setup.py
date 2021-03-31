@@ -63,9 +63,6 @@ setup(
         "Programming Language :: Python :: 3.9",
     ],
     description="Discover hosts by arp and ptr lookup",
-    entry_points={
-        "console_scripts": ["my_example=aiodiscover.bin.my_example:main"],
-    },
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=readme,
