@@ -171,7 +171,7 @@ class DiscoverHosts:
         ips = []
         for host in sys_network_data.network.hosts():
             if len(ips) > MAX_ADDRESSES:
-                _LOGGER.warning(
+                _LOGGER.debug(
                     "Max addresses of %s reached for network: %s",
                     MAX_ADDRESSES,
                     sys_network_data.network,
