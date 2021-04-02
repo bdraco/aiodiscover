@@ -76,7 +76,7 @@ class PTRResolver:
             self.responded.set()
 
     def error_received(self, exc):
-        """Error recieved."""
+        """Error received."""
         self.error = exc
         self.responded.set()
 
