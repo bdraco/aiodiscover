@@ -57,6 +57,7 @@ class PTRResolver:
         self.responses = {}
         self.send_qid = None
         self.responded = asyncio.Event()
+        self.error = None
 
     def connection_lost(self, transport):
         """Connection lost."""
@@ -74,12 +75,19 @@ class PTRResolver:
         if msg.qid == self.send_qid:
             self.responded.set()
 
+    def error_received(self, exc):
+        """Error received."""
+        self.error = exc
+        self.responded.set()
+
     async def send_query(self, query):
         """Send a query and wait for a response."""
         self.responded.clear()
         self.send_qid = query.qid
         self.transport.sendto(query.pack(), self.destination)
         await self.responded.wait()
+        if self.error:
+            raise self.error
 
 
 async def async_query_for_ptrs(nameserver, ips_to_lookup):
@@ -115,6 +123,8 @@ async def _async_query_for_ptrs(protocol, ips_to_lookup):
             time_outs += 1
             if time_outs == MAX_DNS_TIMEOUT_DECLARE_DEAD_NAMESERVER:
                 break
+        except OSError:
+            break
 
     return [protocol.responses.get(query_for_ip.get(ip)) for ip in ips_to_lookup]
 
@@ -161,7 +171,7 @@ class DiscoverHosts:
         ips = []
         for host in sys_network_data.network.hosts():
             if len(ips) > MAX_ADDRESSES:
-                _LOGGER.warning(
+                _LOGGER.debug(
                     "Max addresses of %s reached for network: %s",
                     MAX_ADDRESSES,
                     sys_network_data.network,
