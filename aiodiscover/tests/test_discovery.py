@@ -86,19 +86,6 @@ async def test_ptr_resolver_can_parse():
 
 
 @pytest.mark.asyncio
-async def test_ptr_resolver_can_parse():
-    """Test that the PTRResolver can parse a response."""
-    destination = ("192.168.107.1", discovery.DNS_PORT)
-    ptr_resolver = discovery.PTRResolver(destination)
-    ptr_resolver.datagram_received(UDP_PTR_RESOLUTION_OCTETS, destination)
-    assert 35926 in ptr_resolver.responses
-    assert (
-        discovery.dns_message_short_hostname(ptr_resolver.responses[35926]).lower()
-        == "broadlink_rmprosub-cc-ce-9f"
-    )
-
-
-@pytest.mark.asyncio
 async def test_ptr_resolver_error_received():
     """Test that the PTRResolver raises exception from error_received."""
     destination = ("192.168.107.1", discovery.DNS_PORT)
