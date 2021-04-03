@@ -78,6 +78,6 @@ async def test_ptr_resolver_can_parse():
     ptr_resolver.datagram_received(UDP_PTR_RESOLUTION_OCTETS, destination)
     assert 35926 in ptr_resolver.responses
     assert (
-        discovery.dns_message_short_hostname(ptr_resolver.responses[35926])
+        discovery.dns_message_short_hostname(ptr_resolver.responses[35926]).lower()
         == "broadlink_rmprosub-cc-ce-9f"
     )
