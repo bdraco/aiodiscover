@@ -13,6 +13,9 @@ VALID_MAC_ADDRESS = re.compile("^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$")
 
 ARP_CACHE_POPULATE_TIME = 10
 ARP_TIMEOUT = 10
+
+DEFAULT_NETWORK_PREFIX = 24
+
 IGNORE_NETWORKS = (
     ip_network("169.254.0.0/16"),
     ip_network("127.0.0.0/8"),
@@ -65,9 +68,9 @@ def get_local_ip():
 
 def get_network(local_ip, adapters):
     """Search adapters for the network and broadcast ip."""
-    network_prefix = get_ip_prefix_from_adapters(local_ip, adapters)
-    if network_prefix is None:
-        return None
+    network_prefix = (
+        get_ip_prefix_from_adapters(local_ip, adapters) or DEFAULT_NETWORK_PREFIX
+    )
     return ip_network(f"{local_ip}/{network_prefix}", False)
 
 
