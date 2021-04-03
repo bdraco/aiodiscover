@@ -271,7 +271,7 @@
         <span class="k">lambda</span><span class="p">:</span> <span class="n">PTRResolver</span><span class="p">(</span><span class="n">destination</span><span class="p">),</span> <span class="n">remote_addr</span><span class="o">=</span><span class="n">destination</span>
     <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="k">await</span> <span class="n">_async_query_for_ptrs</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">async_query_for_ptr_with_proto</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
@@ -285,7 +285,7 @@
     <span class="k">return</span> <span class="n">req</span></div>
 
 
-<span class="k">async</span> <span class="k">def</span> <span class="nf">_async_query_for_ptrs</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">):</span>
+<div class="viewcode-block" id="async_query_for_ptr_with_proto"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_query_for_ptr_with_proto">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">async_query_for_ptr_with_proto</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Send and receiver the PTR queries.&quot;&quot;&quot;</span>
     <span class="n">time_outs</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">query_for_ip</span> <span class="o">=</span> <span class="p">{}</span>
@@ -304,7 +304,7 @@
         <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
             <span class="k">break</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">protocol</span><span class="o">.</span><span class="n">responses</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query_for_ip</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ip</span><span class="p">))</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips_to_lookup</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">protocol</span><span class="o">.</span><span class="n">responses</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query_for_ip</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ip</span><span class="p">))</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips_to_lookup</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="DiscoverHosts"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts">[docs]</a><span class="k">class</span> <span class="nc">DiscoverHosts</span><span class="p">:</span>
