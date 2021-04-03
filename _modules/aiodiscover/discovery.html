@@ -178,17 +178,10 @@
             
   <h1>Source code for aiodiscover.discovery</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
 
-<span class="kn">from</span> <span class="nn">async_dns.core</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">RandId</span><span class="p">,</span>
-    <span class="n">DNSMessage</span><span class="p">,</span>
-    <span class="n">types</span><span class="p">,</span>
-    <span class="n">REQUEST</span><span class="p">,</span>
-    <span class="n">Record</span><span class="p">,</span>
-<span class="p">)</span>
-
+<span class="kn">from</span> <span class="nn">async_dns.core</span> <span class="kn">import</span> <span class="n">REQUEST</span><span class="p">,</span> <span class="n">DNSMessage</span><span class="p">,</span> <span class="n">RandId</span><span class="p">,</span> <span class="n">Record</span><span class="p">,</span> <span class="n">types</span>
 <span class="kn">from</span> <span class="nn">pyroute2</span> <span class="kn">import</span> <span class="n">IPRoute</span>
 
 <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">SystemNetworkData</span>
@@ -283,16 +276,22 @@
         <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
+<div class="viewcode-block" id="async_generate_ptr_query"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_generate_ptr_query">[docs]</a><span class="k">def</span> <span class="nf">async_generate_ptr_query</span><span class="p">(</span><span class="n">rand_id</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate a ptr query with the next random id.&quot;&quot;&quot;</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">DNSMessage</span><span class="p">(</span><span class="n">qr</span><span class="o">=</span><span class="n">REQUEST</span><span class="p">)</span>
+    <span class="n">req</span><span class="o">.</span><span class="n">qd</span> <span class="o">=</span> <span class="p">[</span><span class="n">Record</span><span class="p">(</span><span class="n">REQUEST</span><span class="p">,</span> <span class="n">ip_to_ptr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)),</span> <span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">)]</span>
+    <span class="n">req</span><span class="o">.</span><span class="n">qid</span> <span class="o">=</span> <span class="n">rand_id</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="n">rand_id</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">qid</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">req</span></div>
+
+
 <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_query_for_ptrs</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Send and receiver the PTR queries.&quot;&quot;&quot;</span>
     <span class="n">time_outs</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">query_for_ip</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">rand_id</span> <span class="o">=</span> <span class="n">RandId</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips_to_lookup</span><span class="p">:</span>
-        <span class="n">req</span> <span class="o">=</span> <span class="n">DNSMessage</span><span class="p">(</span><span class="n">qr</span><span class="o">=</span><span class="n">REQUEST</span><span class="p">)</span>
-        <span class="n">req</span><span class="o">.</span><span class="n">qd</span> <span class="o">=</span> <span class="p">[</span><span class="n">Record</span><span class="p">(</span><span class="n">REQUEST</span><span class="p">,</span> <span class="n">ip_to_ptr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)),</span> <span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">)]</span>
-        <span class="n">req</span><span class="o">.</span><span class="n">qid</span> <span class="o">=</span> <span class="n">rand_id</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-        <span class="n">rand_id</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">qid</span><span class="p">)</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">async_generate_ptr_query</span><span class="p">(</span><span class="n">rand_id</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
         <span class="n">query_for_ip</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">qid</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
