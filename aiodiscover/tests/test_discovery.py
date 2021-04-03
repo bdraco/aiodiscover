@@ -96,3 +96,16 @@ async def test_ptr_resolver_error_received():
     req = discovery.async_generate_ptr_query(RandId(), "1.2.3.4")
     with pytest.raises(ConnectionRefusedError):
         await ptr_resolver.send_query(req)
+
+
+@pytest.mark.asyncio
+async def test_async_query_for_ptr_with_proto():
+    """Test async_query_for_ptr_with_proto handles OSErrors without raising."""
+    destination = ("192.168.107.1", discovery.DNS_PORT)
+    ptr_resolver = discovery.PTRResolver(destination)
+    ptr_resolver.transport = MagicMock()
+    loop = asyncio.get_running_loop()
+    ptr_resolver.datagram_received(UDP_PTR_RESOLUTION_OCTETS, destination)
+    loop.call_later(0.01, ptr_resolver.error_received, ConnectionRefusedError)
+    await discovery.async_query_for_ptr_with_proto(ptr_resolver, ["1.2.3.4"])
+    assert 35926 in ptr_resolver.responses
