@@ -92,7 +92,7 @@ async def async_query_for_ptrs(nameserver, ips_to_lookup):
         lambda: PTRResolver(destination), remote_addr=destination
     )
     try:
-        return await _async_query_for_ptrs(protocol, ips_to_lookup)
+        return await async_query_for_ptr_with_proto(protocol, ips_to_lookup)
     finally:
         transport.close()
 
@@ -106,7 +106,7 @@ def async_generate_ptr_query(rand_id, ip):
     return req
 
 
-async def _async_query_for_ptrs(protocol, ips_to_lookup):
+async def async_query_for_ptr_with_proto(protocol, ips_to_lookup):
     """Send and receiver the PTR queries."""
     time_outs = 0
     query_for_ip = {}
