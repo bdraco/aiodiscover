@@ -1,15 +1,8 @@
 import asyncio
-from contextlib import suppress
 import logging
+from contextlib import suppress
 
-from async_dns.core import (
-    RandId,
-    DNSMessage,
-    types,
-    REQUEST,
-    Record,
-)
-
+from async_dns.core import REQUEST, DNSMessage, RandId, Record, types
 from pyroute2 import IPRoute
 
 from .network import SystemNetworkData
@@ -104,16 +97,22 @@ async def async_query_for_ptrs(nameserver, ips_to_lookup):
         transport.close()
 
 
+def async_generate_ptr_query(rand_id, ip):
+    """Generate a ptr query with the next random id."""
+    req = DNSMessage(qr=REQUEST)
+    req.qd = [Record(REQUEST, ip_to_ptr(str(ip)), types.PTR)]
+    req.qid = rand_id.get()
+    rand_id.put(req.qid)
+    return req
+
+
 async def _async_query_for_ptrs(protocol, ips_to_lookup):
     """Send and receiver the PTR queries."""
     time_outs = 0
     query_for_ip = {}
     rand_id = RandId()
     for ip in ips_to_lookup:
-        req = DNSMessage(qr=REQUEST)
-        req.qd = [Record(REQUEST, ip_to_ptr(str(ip)), types.PTR)]
-        req.qid = rand_id.get()
-        rand_id.put(req.qid)
+        req = async_generate_ptr_query(rand_id, ip)
         query_for_ip[ip] = req.qid
         try:
             await asyncio.wait_for(

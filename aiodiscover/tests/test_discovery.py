@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from unittest.mock import patch
+import asyncio
+from unittest.mock import MagicMock, patch
 
 import pytest
+from async_dns.core import RandId
 
 from aiodiscover import discovery
 
@@ -81,3 +83,16 @@ async def test_ptr_resolver_can_parse():
         discovery.dns_message_short_hostname(ptr_resolver.responses[35926]).lower()
         == "broadlink_rmprosub-cc-ce-9f"
     )
+
+
+@pytest.mark.asyncio
+async def test_ptr_resolver_error_received():
+    """Test that the PTRResolver raises exception from error_received."""
+    destination = ("192.168.107.1", discovery.DNS_PORT)
+    ptr_resolver = discovery.PTRResolver(destination)
+    ptr_resolver.transport = MagicMock()
+    loop = asyncio.get_running_loop()
+    loop.call_later(0.01, ptr_resolver.error_received, ConnectionRefusedError)
+    req = discovery.async_generate_ptr_query(RandId(), "1.2.3.4")
+    with pytest.raises(ConnectionRefusedError):
+        await ptr_resolver.send_query(req)
