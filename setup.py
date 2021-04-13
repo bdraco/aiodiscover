@@ -38,7 +38,7 @@ dev_requirements = [
     "wheel>=0.34.2",
 ]
 
-requirements = ["async_dns", "ifaddr", "pyroute2"]
+requirements = ["async_dns", "ifaddr", "pyroute2>=0.5.18"]
 
 extra_requirements = {
     "setup": setup_requirements,
