@@ -4,7 +4,6 @@ import asyncio
 from unittest.mock import MagicMock, patch
 
 import pytest
-from async_dns.core import RandId
 
 from aiodiscover import discovery
 
@@ -93,7 +92,7 @@ async def test_ptr_resolver_error_received():
     ptr_resolver.transport = MagicMock()
     loop = asyncio.get_running_loop()
     loop.call_later(0.01, ptr_resolver.error_received, ConnectionRefusedError)
-    req = discovery.async_generate_ptr_query(RandId(), "1.2.3.4")
+    req = discovery.async_generate_ptr_query("1.2.3.4")
     with pytest.raises(ConnectionRefusedError):
         await ptr_resolver.send_query(req)
 

@@ -2,7 +2,7 @@ import asyncio
 import logging
 from contextlib import suppress
 
-from async_dns.core import REQUEST, DNSMessage, RandId, Record, types
+from dns import message, rdatatype, exception
 from pyroute2 import IPRoute
 
 from .network import SystemNetworkData
@@ -33,12 +33,14 @@ def short_hostname(hostname):
 
 def dns_message_short_hostname(dns_message):
     """Get the short hostname from a dns message."""
-    if not isinstance(dns_message, DNSMessage):
+    if not isinstance(dns_message, message.Message) or not dns_message.answer:
         return None
-    record = dns_message.get_record((types.PTR,))
-    if record is None:
-        return None
-    return short_hostname(record)
+    for answer in dns_message.answer:
+        if answer.rdtype != rdatatype.PTR:
+            continue
+        for item in answer.items:
+            return short_hostname(item.target.to_text())
+    return None
 
 
 class PTRResolver:
@@ -48,7 +50,7 @@ class PTRResolver:
         """Init protocol for a destination."""
         self.destination = destination
         self.responses = {}
-        self.send_qid = None
+        self.send_id = None
         self.responded = asyncio.Event()
         self.error = None
 
@@ -63,9 +65,12 @@ class PTRResolver:
         """Response recieved."""
         if addr != self.destination:
             return
-        msg = DNSMessage.parse(data)
-        self.responses[msg.qid] = msg
-        if msg.qid == self.send_qid:
+        try:
+            msg = message.from_wire(data)
+        except exception.DNSException:
+            return
+        self.responses[msg.id] = msg
+        if msg.id == self.send_id:
             self.responded.set()
 
     def error_received(self, exc):
@@ -76,8 +81,8 @@ class PTRResolver:
     async def send_query(self, query):
         """Send a query and wait for a response."""
         self.responded.clear()
-        self.send_qid = query.qid
-        self.transport.sendto(query.pack(), self.destination)
+        self.send_id = query.id
+        self.transport.sendto(query.to_wire(), self.destination)
         await self.responded.wait()
         if self.error:
             raise self.error
@@ -97,23 +102,18 @@ async def async_query_for_ptrs(nameserver, ips_to_lookup):
         transport.close()
 
 
-def async_generate_ptr_query(rand_id, ip):
+def async_generate_ptr_query(ip):
     """Generate a ptr query with the next random id."""
-    req = DNSMessage(qr=REQUEST)
-    req.qd = [Record(REQUEST, ip_to_ptr(str(ip)), types.PTR)]
-    req.qid = rand_id.get()
-    rand_id.put(req.qid)
-    return req
+    return message.make_query(ip_to_ptr(str(ip)), rdatatype.PTR)
 
 
 async def async_query_for_ptr_with_proto(protocol, ips_to_lookup):
     """Send and receiver the PTR queries."""
     time_outs = 0
     query_for_ip = {}
-    rand_id = RandId()
     for ip in ips_to_lookup:
-        req = async_generate_ptr_query(rand_id, ip)
-        query_for_ip[ip] = req.qid
+        req = async_generate_ptr_query(ip)
+        query_for_ip[ip] = req.id
         try:
             await asyncio.wait_for(
                 protocol.send_query(req), timeout=DNS_RESPONSE_TIMEOUT
