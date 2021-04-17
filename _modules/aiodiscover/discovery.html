@@ -181,7 +181,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
 
-<span class="kn">from</span> <span class="nn">async_dns.core</span> <span class="kn">import</span> <span class="n">REQUEST</span><span class="p">,</span> <span class="n">DNSMessage</span><span class="p">,</span> <span class="n">RandId</span><span class="p">,</span> <span class="n">Record</span><span class="p">,</span> <span class="n">types</span>
+<span class="kn">from</span> <span class="nn">dns</span> <span class="kn">import</span> <span class="n">message</span><span class="p">,</span> <span class="n">rdatatype</span><span class="p">,</span> <span class="n">exception</span>
 <span class="kn">from</span> <span class="nn">pyroute2</span> <span class="kn">import</span> <span class="n">IPRoute</span>
 
 <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">SystemNetworkData</span>
@@ -212,12 +212,14 @@
 
 <div class="viewcode-block" id="dns_message_short_hostname"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.dns_message_short_hostname">[docs]</a><span class="k">def</span> <span class="nf">dns_message_short_hostname</span><span class="p">(</span><span class="n">dns_message</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get the short hostname from a dns message.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dns_message</span><span class="p">,</span> <span class="n">DNSMessage</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dns_message</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">Message</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">dns_message</span><span class="o">.</span><span class="n">answer</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">record</span> <span class="o">=</span> <span class="n">dns_message</span><span class="o">.</span><span class="n">get_record</span><span class="p">((</span><span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">,))</span>
-    <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">return</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+    <span class="k">for</span> <span class="n">answer</span> <span class="ow">in</span> <span class="n">dns_message</span><span class="o">.</span><span class="n">answer</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">answer</span><span class="o">.</span><span class="n">rdtype</span> <span class="o">!=</span> <span class="n">rdatatype</span><span class="o">.</span><span class="n">PTR</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">answer</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">to_text</span><span class="p">())</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="PTRResolver"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.PTRResolver">[docs]</a><span class="k">class</span> <span class="nc">PTRResolver</span><span class="p">:</span>
@@ -227,7 +229,7 @@
         <span class="sd">&quot;&quot;&quot;Init protocol for a destination.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">destination</span> <span class="o">=</span> <span class="n">destination</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">responses</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send_qid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">responded</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -242,9 +244,12 @@
         <span class="sd">&quot;&quot;&quot;Response recieved.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">addr</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">DNSMessage</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">qid</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
-        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">qid</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_qid</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">from_wire</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">exception</span><span class="o">.</span><span class="n">DNSException</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">responses</span><span class="p">[</span><span class="n">msg</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_id</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">responded</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="PTRResolver.error_received"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.PTRResolver.error_received">[docs]</a>    <span class="k">def</span> <span class="nf">error_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
@@ -255,8 +260,8 @@
 <div class="viewcode-block" id="PTRResolver.send_query"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.PTRResolver.send_query">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">send_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Send a query and wait for a response.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">responded</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send_qid</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">qid</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">pack</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_id</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">to_wire</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">responded</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
             <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span></div></div>
@@ -276,23 +281,18 @@
         <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="async_generate_ptr_query"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_generate_ptr_query">[docs]</a><span class="k">def</span> <span class="nf">async_generate_ptr_query</span><span class="p">(</span><span class="n">rand_id</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+<div class="viewcode-block" id="async_generate_ptr_query"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_generate_ptr_query">[docs]</a><span class="k">def</span> <span class="nf">async_generate_ptr_query</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generate a ptr query with the next random id.&quot;&quot;&quot;</span>
-    <span class="n">req</span> <span class="o">=</span> <span class="n">DNSMessage</span><span class="p">(</span><span class="n">qr</span><span class="o">=</span><span class="n">REQUEST</span><span class="p">)</span>
-    <span class="n">req</span><span class="o">.</span><span class="n">qd</span> <span class="o">=</span> <span class="p">[</span><span class="n">Record</span><span class="p">(</span><span class="n">REQUEST</span><span class="p">,</span> <span class="n">ip_to_ptr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)),</span> <span class="n">types</span><span class="o">.</span><span class="n">PTR</span><span class="p">)]</span>
-    <span class="n">req</span><span class="o">.</span><span class="n">qid</span> <span class="o">=</span> <span class="n">rand_id</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-    <span class="n">rand_id</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">qid</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">req</span></div>
+    <span class="k">return</span> <span class="n">message</span><span class="o">.</span><span class="n">make_query</span><span class="p">(</span><span class="n">ip_to_ptr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)),</span> <span class="n">rdatatype</span><span class="o">.</span><span class="n">PTR</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="async_query_for_ptr_with_proto"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_query_for_ptr_with_proto">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">async_query_for_ptr_with_proto</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Send and receiver the PTR queries.&quot;&quot;&quot;</span>
     <span class="n">time_outs</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">query_for_ip</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">rand_id</span> <span class="o">=</span> <span class="n">RandId</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips_to_lookup</span><span class="p">:</span>
-        <span class="n">req</span> <span class="o">=</span> <span class="n">async_generate_ptr_query</span><span class="p">(</span><span class="n">rand_id</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
-        <span class="n">query_for_ip</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">qid</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">async_generate_ptr_query</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+        <span class="n">query_for_ip</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">id</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
                 <span class="n">protocol</span><span class="o">.</span><span class="n">send_query</span><span class="p">(</span><span class="n">req</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DNS_RESPONSE_TIMEOUT</span>
