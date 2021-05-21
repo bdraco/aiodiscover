@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -181,7 +184,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
 
-<span class="kn">from</span> <span class="nn">dns</span> <span class="kn">import</span> <span class="n">message</span><span class="p">,</span> <span class="n">rdatatype</span><span class="p">,</span> <span class="n">exception</span>
+<span class="kn">from</span> <span class="nn">dns</span> <span class="kn">import</span> <span class="n">exception</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">rdatatype</span>
 <span class="kn">from</span> <span class="nn">pyroute2</span> <span class="kn">import</span> <span class="n">IPRoute</span>
 
 <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">SystemNetworkData</span>
@@ -196,13 +199,6 @@
 <span class="n">DNS_PORT</span> <span class="o">=</span> <span class="mi">53</span>
 
 <span class="n">_LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="ip_to_ptr"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.ip_to_ptr">[docs]</a><span class="k">def</span> <span class="nf">ip_to_ptr</span><span class="p">(</span><span class="n">ip_address</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert an ip string to a PTR.&quot;&quot;&quot;</span>
-    <span class="n">ipl</span> <span class="o">=</span> <span class="n">ip_address</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-    <span class="n">ipl</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ipl</span><span class="p">)</span><span class="si">}</span><span class="s2">.in-addr.arpa&quot;</span></div>
 
 
 <div class="viewcode-block" id="short_hostname"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.short_hostname">[docs]</a><span class="k">def</span> <span class="nf">short_hostname</span><span class="p">(</span><span class="n">hostname</span><span class="p">):</span>
@@ -283,7 +279,7 @@
 
 <div class="viewcode-block" id="async_generate_ptr_query"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_generate_ptr_query">[docs]</a><span class="k">def</span> <span class="nf">async_generate_ptr_query</span><span class="p">(</span><span class="n">ip</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generate a ptr query with the next random id.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">message</span><span class="o">.</span><span class="n">make_query</span><span class="p">(</span><span class="n">ip_to_ptr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)),</span> <span class="n">rdatatype</span><span class="o">.</span><span class="n">PTR</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">message</span><span class="o">.</span><span class="n">make_query</span><span class="p">(</span><span class="n">ip</span><span class="o">.</span><span class="n">reverse_pointer</span><span class="p">,</span> <span class="n">rdatatype</span><span class="o">.</span><span class="n">PTR</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="async_query_for_ptr_with_proto"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.async_query_for_ptr_with_proto">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">async_query_for_ptr_with_proto</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">):</span>
@@ -355,17 +351,17 @@
                     <span class="n">sys_network_data</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">break</span>
-            <span class="n">ips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">host</span><span class="p">))</span>
+            <span class="n">ips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
 
         <span class="n">hostnames</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">nameserver</span> <span class="ow">in</span> <span class="n">all_nameservers</span><span class="p">:</span>
-            <span class="n">ips_to_lookup</span> <span class="o">=</span> <span class="p">[</span><span class="n">ip</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="n">ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hostnames</span><span class="p">]</span>
+            <span class="n">ips_to_lookup</span> <span class="o">=</span> <span class="p">[</span><span class="n">ip</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hostnames</span><span class="p">]</span>
             <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">async_query_for_ptrs</span><span class="p">(</span><span class="n">nameserver</span><span class="p">,</span> <span class="n">ips_to_lookup</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ip</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ips_to_lookup</span><span class="p">):</span>
                 <span class="n">short_host</span> <span class="o">=</span> <span class="n">dns_message_short_hostname</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
                 <span class="k">if</span> <span class="n">short_host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="n">hostnames</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">short_host</span>
+                <span class="n">hostnames</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)]</span> <span class="o">=</span> <span class="n">short_host</span>
             <span class="k">if</span> <span class="n">hostnames</span><span class="p">:</span>
                 <span class="c1"># As soon as we have a responsive nameserver, there</span>
                 <span class="c1"># is no need to query additional fallbacks</span>
