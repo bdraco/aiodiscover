@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import asyncio
+from ipaddress import ip_address
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -92,7 +93,7 @@ async def test_ptr_resolver_error_received():
     ptr_resolver.transport = MagicMock()
     loop = asyncio.get_running_loop()
     loop.call_later(0.01, ptr_resolver.error_received, ConnectionRefusedError)
-    req = discovery.async_generate_ptr_query("1.2.3.4")
+    req = discovery.async_generate_ptr_query(ip_address("1.2.3.4"))
     with pytest.raises(ConnectionRefusedError):
         await ptr_resolver.send_query(req)
 
@@ -106,5 +107,7 @@ async def test_async_query_for_ptr_with_proto():
     loop = asyncio.get_running_loop()
     ptr_resolver.datagram_received(UDP_PTR_RESOLUTION_OCTETS, destination)
     loop.call_later(0.01, ptr_resolver.error_received, ConnectionRefusedError)
-    await discovery.async_query_for_ptr_with_proto(ptr_resolver, ["1.2.3.4"])
+    await discovery.async_query_for_ptr_with_proto(
+        ptr_resolver, [ip_address("1.2.3.4")]
+    )
     assert 35926 in ptr_resolver.responses

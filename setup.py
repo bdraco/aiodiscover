@@ -38,7 +38,7 @@ dev_requirements = [
     "wheel>=0.34.2",
 ]
 
-requirements = ["dnspython>=2.1.0", "ifaddr", "pyroute2>=0.5.18"]
+requirements = ["dnspython>=2.1.0", "ifaddr", "pyroute2>=0.5.18,!=0.6.1"]
 
 extra_requirements = {
     "setup": setup_requirements,
