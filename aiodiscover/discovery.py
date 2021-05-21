@@ -2,7 +2,7 @@ import asyncio
 import logging
 from contextlib import suppress
 
-from dns import message, rdatatype, exception
+from dns import exception, message, rdatatype
 from pyroute2 import IPRoute
 
 from .network import SystemNetworkData
@@ -17,13 +17,6 @@ MAX_DNS_TIMEOUT_DECLARE_DEAD_NAMESERVER = 5
 DNS_PORT = 53
 
 _LOGGER = logging.getLogger(__name__)
-
-
-def ip_to_ptr(ip_address):
-    """Convert an ip string to a PTR."""
-    ipl = ip_address.split(".")
-    ipl.reverse()
-    return f"{'.'.join(ipl)}.in-addr.arpa"
 
 
 def short_hostname(hostname):
@@ -104,7 +97,7 @@ async def async_query_for_ptrs(nameserver, ips_to_lookup):
 
 def async_generate_ptr_query(ip):
     """Generate a ptr query with the next random id."""
-    return message.make_query(ip_to_ptr(str(ip)), rdatatype.PTR)
+    return message.make_query(ip.reverse_pointer, rdatatype.PTR)
 
 
 async def async_query_for_ptr_with_proto(protocol, ips_to_lookup):
@@ -176,17 +169,17 @@ class DiscoverHosts:
                     sys_network_data.network,
                 )
                 break
-            ips.append(str(host))
+            ips.append(host)
 
         hostnames = {}
         for nameserver in all_nameservers:
-            ips_to_lookup = [ip for ip in ips if ip not in hostnames]
+            ips_to_lookup = [ip for ip in ips if str(ip) not in hostnames]
             results = await async_query_for_ptrs(nameserver, ips_to_lookup)
             for idx, ip in enumerate(ips_to_lookup):
                 short_host = dns_message_short_hostname(results[idx])
                 if short_host is None:
                     continue
-                hostnames[ip] = short_host
+                hostnames[str(ip)] = short_host
             if hostnames:
                 # As soon as we have a responsive nameserver, there
                 # is no need to query additional fallbacks
