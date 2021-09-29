@@ -3,7 +3,6 @@ import logging
 from contextlib import suppress
 
 from dns import exception, message, rdatatype
-from pyroute2 import IPRoute
 
 from .network import SystemNetworkData
 
@@ -128,6 +127,8 @@ class DiscoverHosts:
         """Init the discovery hosts."""
         self.ip_route = None
         with suppress(Exception):
+            from pyroute2 import IPRoute  # pylint: disable=import-outside-toplevel
+
             self.ip_route = IPRoute()
 
     async def async_discover(self):
