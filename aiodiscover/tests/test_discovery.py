@@ -48,14 +48,14 @@ async def test_async_discover_hosts_with_dns_mock_neighbor_mock():
         "aiodiscover.network.SystemNetworkData.async_get_neighbors",
         return_value={
             "1.2.3.4": "aa:bb:cc:dd:ee:ff",
-            "4.5.5.6": "ff:bb:cc:dd:ee:ff",
+            "4.5.5.6": "ff:bb:cc:0d:ee:ff",
         },
     ):
         hosts = await discover_hosts.async_discover()
 
     assert hosts == [
         {"hostname": "router", "ip": "1.2.3.4", "macaddress": "aa:bb:cc:dd:ee:ff"},
-        {"hostname": "any", "ip": "4.5.5.6", "macaddress": "ff:bb:cc:dd:ee:ff"},
+        {"hostname": "any", "ip": "4.5.5.6", "macaddress": "ff:bb:cc:0d:ee:ff"},
     ]
 
 

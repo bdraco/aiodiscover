@@ -104,6 +104,7 @@ def _fill_neighbor(neighbours, ip, mac):
         return
     if not VALID_MAC_ADDRESS.match(mac):
         return
+    mac = ":".join([i.zfill(2) for i in mac.split(":")])
     if mac in IGNORE_MACS:
         return
     neighbours[ip] = mac
