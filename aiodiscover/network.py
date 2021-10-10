@@ -80,6 +80,7 @@ def get_ip_prefix_from_adapters(local_ip, adapters):
         for ip in adapter.ips:
             if local_ip == ip.ip:
                 return ip.network_prefix
+    return None
 
 
 def get_attrs_key(data, key):
@@ -131,6 +132,8 @@ class SystemNetworkData:
         self.local_ip = None
         self.broadcast_ip = None
         self.router_ip = None
+        self.network = None
+        self.adapters = None
         self.nameservers = []
 
     def setup(self):
