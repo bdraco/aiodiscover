@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
@@ -40,7 +40,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: 3.9
     - name: Install Dependencies
@@ -62,7 +62,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v2
       with:
         python-version: 3.9
     - name: Install Dependencies
