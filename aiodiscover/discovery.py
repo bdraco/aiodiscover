@@ -136,6 +136,14 @@ class DiscoverHosts:
         sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(None, sys_network_data.setup)
+        network = sys_network_data.network
+        if network.num_addresses > MAX_ADDRESSES:
+            _LOGGER.debug(
+                "The network %s exceeds the maximum number of addresses, %s; No scanning performed",
+                network,
+                MAX_ADDRESSES,
+            )
+            return []
         hostnames = await self.async_get_hostnames(sys_network_data)
         neighbours = await sys_network_data.async_get_neighbors(hostnames.keys())
         return [
@@ -161,17 +169,7 @@ class DiscoverHosts:
     async def async_get_hostnames(self, sys_network_data):
         """Lookup PTR records for all addresses in the network."""
         all_nameservers = await self._async_get_nameservers(sys_network_data)
-        ips = []
-        for host in sys_network_data.network.hosts():
-            if len(ips) > MAX_ADDRESSES:
-                _LOGGER.debug(
-                    "Max addresses of %s reached for network: %s",
-                    MAX_ADDRESSES,
-                    sys_network_data.network,
-                )
-                break
-            ips.append(host)
-
+        ips = list(sys_network_data.network.hosts())
         hostnames = {}
         for nameserver in all_nameservers:
             ips_to_lookup = [ip for ip in ips if str(ip) not in hostnames]

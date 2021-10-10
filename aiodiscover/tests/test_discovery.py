@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import asyncio
-from ipaddress import ip_address
+from ipaddress import IPv4Network, ip_address
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -50,6 +50,9 @@ async def test_async_discover_hosts_with_dns_mock_neighbor_mock():
             "1.2.3.4": "aa:bb:cc:dd:ee:ff",
             "4.5.5.6": "ff:bb:cc:0d:ee:ff",
         },
+    ), patch(
+        "aiodiscover.network.get_network",
+        return_value=IPv4Network("1.2.3.0/24", False),
     ):
         hosts = await discover_hosts.async_discover()
 
