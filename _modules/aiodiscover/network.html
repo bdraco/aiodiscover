@@ -169,7 +169,8 @@
     <span class="k">for</span> <span class="n">adapter</span> <span class="ow">in</span> <span class="n">adapters</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">adapter</span><span class="o">.</span><span class="n">ips</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">local_ip</span> <span class="o">==</span> <span class="n">ip</span><span class="o">.</span><span class="n">ip</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">ip</span><span class="o">.</span><span class="n">network_prefix</span></div>
+                <span class="k">return</span> <span class="n">ip</span><span class="o">.</span><span class="n">network_prefix</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="get_attrs_key"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_attrs_key">[docs]</a><span class="k">def</span> <span class="nf">get_attrs_key</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
@@ -221,6 +222,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_ip</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adapters</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nameservers</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="SystemNetworkData.setup"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

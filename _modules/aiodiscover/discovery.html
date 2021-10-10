@@ -226,6 +226,14 @@
         <span class="n">sys_network_data</span> <span class="o">=</span> <span class="n">SystemNetworkData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">)</span>
         <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
         <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">setup</span><span class="p">)</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">network</span>
+        <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">num_addresses</span> <span class="o">&gt;</span> <span class="n">MAX_ADDRESSES</span><span class="p">:</span>
+            <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;The network </span><span class="si">%s</span><span class="s2"> exceeds the maximum number of addresses, </span><span class="si">%s</span><span class="s2">; No scanning performed&quot;</span><span class="p">,</span>
+                <span class="n">network</span><span class="p">,</span>
+                <span class="n">MAX_ADDRESSES</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
         <span class="n">hostnames</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">async_get_hostnames</span><span class="p">(</span><span class="n">sys_network_data</span><span class="p">)</span>
         <span class="n">neighbours</span> <span class="o">=</span> <span class="k">await</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">async_get_neighbors</span><span class="p">(</span><span class="n">hostnames</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">return</span> <span class="p">[</span>
@@ -251,17 +259,7 @@
 <div class="viewcode-block" id="DiscoverHosts.async_get_hostnames"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts.async_get_hostnames">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_hostnames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sys_network_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Lookup PTR records for all addresses in the network.&quot;&quot;&quot;</span>
         <span class="n">all_nameservers</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_nameservers</span><span class="p">(</span><span class="n">sys_network_data</span><span class="p">)</span>
-        <span class="n">ips</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">hosts</span><span class="p">():</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ips</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">MAX_ADDRESSES</span><span class="p">:</span>
-                <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="s2">&quot;Max addresses of </span><span class="si">%s</span><span class="s2"> reached for network: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="n">MAX_ADDRESSES</span><span class="p">,</span>
-                    <span class="n">sys_network_data</span><span class="o">.</span><span class="n">network</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">break</span>
-            <span class="n">ips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
-
+        <span class="n">ips</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sys_network_data</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">hosts</span><span class="p">())</span>
         <span class="n">hostnames</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">nameserver</span> <span class="ow">in</span> <span class="n">all_nameservers</span><span class="p">:</span>
             <span class="n">ips_to_lookup</span> <span class="o">=</span> <span class="p">[</span><span class="n">ip</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hostnames</span><span class="p">]</span>
