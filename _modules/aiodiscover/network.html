@@ -126,7 +126,7 @@
 
 <div class="viewcode-block" id="load_resolv_conf"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.load_resolv_conf">[docs]</a><span class="k">def</span> <span class="nf">load_resolv_conf</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Load the resolv.conf.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/etc/resolv.conf&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/etc/resolv.conf&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
     <span class="n">nameservers</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
@@ -248,6 +248,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="n">get_router_ip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span><span class="p">:</span>
+            <span class="c1"># On MacOS netifaces is the only reliable way to get the default gateway</span>
+            <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+                <span class="kn">import</span> <span class="nn">netifaces</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="n">netifaces</span><span class="o">.</span><span class="n">gateways</span><span class="p">()[</span><span class="s2">&quot;default&quot;</span><span class="p">][</span><span class="n">netifaces</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span><span class="p">:</span>
             <span class="n">network_address</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">network_address</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network_address</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">1&quot;</span></div>

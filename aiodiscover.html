@@ -102,19 +102,19 @@
 <span id="aiodiscover-discovery-module"></span><h2>aiodiscover.discovery module<a class="headerlink" href="#module-aiodiscover.discovery" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="aiodiscover.discovery.DiscoverHosts">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></span><span class="sig-name descname"><span class="pre">DiscoverHosts</span></span><a class="reference internal" href="_modules/aiodiscover/discovery.html#DiscoverHosts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.DiscoverHosts" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></span><span class="sig-name descname"><span class="pre">DiscoverHosts</span></span><a class="reference internal" href="_modules/aiodiscover/discovery.html#DiscoverHosts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.DiscoverHosts" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Discover hosts on the network by ARP and PTR lookup.</p>
 <p>Init the discovery hosts.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="aiodiscover.discovery.DiscoverHosts.async_discover">
-<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">async_discover</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#DiscoverHosts.async_discover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.DiscoverHosts.async_discover" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">async_discover</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#DiscoverHosts.async_discover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.DiscoverHosts.async_discover" title="Permalink to this definition"></a></dt>
 <dd><p>Discover hosts on the network by ARP and PTR lookup.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="aiodiscover.discovery.DiscoverHosts.async_get_hostnames">
-<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">async_get_hostnames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sys_network_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#DiscoverHosts.async_get_hostnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.DiscoverHosts.async_get_hostnames" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">async_get_hostnames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sys_network_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#DiscoverHosts.async_get_hostnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.DiscoverHosts.async_get_hostnames" title="Permalink to this definition"></a></dt>
 <dd><p>Lookup PTR records for all addresses in the network.</p>
 </dd></dl>
 
@@ -122,7 +122,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="aiodiscover.discovery.PTRResolver">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></span><span class="sig-name descname"><span class="pre">PTRResolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#PTRResolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.PTRResolver" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></span><span class="sig-name descname"><span class="pre">PTRResolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#PTRResolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.PTRResolver" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Implement DNS PTR resolver.</p>
 <p>Init protocol for a destination.</p>
@@ -152,7 +152,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="aiodiscover.discovery.PTRResolver.send_query">
-<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">send_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#PTRResolver.send_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.PTRResolver.send_query" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#PTRResolver.send_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.PTRResolver.send_query" title="Permalink to this definition"></a></dt>
 <dd><p>Send a query and wait for a response.</p>
 </dd></dl>
 
@@ -166,13 +166,13 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="aiodiscover.discovery.async_query_for_ptr_with_proto">
-<em class="property"><span class="pre">async</span> </em><span class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></span><span class="sig-name descname"><span class="pre">async_query_for_ptr_with_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ips_to_lookup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#async_query_for_ptr_with_proto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.async_query_for_ptr_with_proto" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></span><span class="sig-name descname"><span class="pre">async_query_for_ptr_with_proto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ips_to_lookup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#async_query_for_ptr_with_proto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.async_query_for_ptr_with_proto" title="Permalink to this definition"></a></dt>
 <dd><p>Send and receiver the PTR queries.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="aiodiscover.discovery.async_query_for_ptrs">
-<em class="property"><span class="pre">async</span> </em><span class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></span><span class="sig-name descname"><span class="pre">async_query_for_ptrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nameserver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ips_to_lookup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#async_query_for_ptrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.async_query_for_ptrs" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiodiscover.discovery.</span></span><span class="sig-name descname"><span class="pre">async_query_for_ptrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nameserver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ips_to_lookup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/discovery.html#async_query_for_ptrs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.discovery.async_query_for_ptrs" title="Permalink to this definition"></a></dt>
 <dd><p>Fetch PTR records for a list of ips.</p>
 </dd></dl>
 
@@ -193,13 +193,13 @@
 <span id="aiodiscover-network-module"></span><h2>aiodiscover.network module<a class="headerlink" href="#module-aiodiscover.network" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="aiodiscover.network.SystemNetworkData">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></span><span class="sig-name descname"><span class="pre">SystemNetworkData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_route</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aiodiscover.network.</span></span><span class="sig-name descname"><span class="pre">SystemNetworkData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_route</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Gather system network data.</p>
 <p>Init system network data.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="aiodiscover.network.SystemNetworkData.async_get_neighbors">
-<em class="property"><span class="pre">async</span> </em><span class="sig-name descname"><span class="pre">async_get_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ips</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData.async_get_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData.async_get_neighbors" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">async_get_neighbors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ips</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aiodiscover/network.html#SystemNetworkData.async_get_neighbors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aiodiscover.network.SystemNetworkData.async_get_neighbors" title="Permalink to this definition"></a></dt>
 <dd><p>Get neighbors with best available method.</p>
 </dd></dl>
 
