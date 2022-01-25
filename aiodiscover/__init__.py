@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Top-level package for Async Host discovery."""
 
 __author__ = "J. Nick Koston"

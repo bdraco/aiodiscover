@@ -36,7 +36,7 @@ IGNORE_MACS = ("00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff")
 
 def load_resolv_conf():
     """Load the resolv.conf."""
-    with open("/etc/resolv.conf", "r") as file:
+    with open("/etc/resolv.conf") as file:
         lines = tuple(file)
     nameservers = set()
     for line in lines:
@@ -158,6 +158,12 @@ class SystemNetworkData:
                 self.router_ip = get_router_ip(self.ip_route)
             except Exception:
                 pass
+        if not self.router_ip:
+            # On MacOS netifaces is the only reliable way to get the default gateway
+            with suppress(Exception):
+                import netifaces  # pylint: disable=import-outside-toplevel
+
+                self.router_ip = netifaces.gateways()["default"][netifaces.AF_INET][0]
         if not self.router_ip:
             network_address = str(self.network.network_address)
             self.router_ip = f"{network_address[:-1]}1"
