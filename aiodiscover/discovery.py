@@ -125,17 +125,22 @@ class DiscoverHosts:
 
     def __init__(self):
         """Init the discovery hosts."""
-        self.ip_route = None
-        with suppress(Exception):
-            from pyroute2 import IPRoute  # pylint: disable=import-outside-toplevel
+        self._ip_route = None
 
-            self.ip_route = IPRoute()
+    def _get_sys_network_data(self):
+        if not self._ip_route:
+            with suppress(Exception):
+                from pyroute2 import IPRoute  # pylint: disable=import-outside-toplevel
+
+                self._ip_route = IPRoute()
+        sys_network_data = SystemNetworkData(self._ip_route)
+        sys_network_data.setup()
+        return sys_network_data
 
     async def async_discover(self):
         """Discover hosts on the network by ARP and PTR lookup."""
-        sys_network_data = SystemNetworkData(self.ip_route)
         loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, sys_network_data.setup)
+        sys_network_data = await loop.run_in_executor(None, self._get_sys_network_data)
         network = sys_network_data.network
         if network.num_addresses > MAX_ADDRESSES:
             _LOGGER.debug(
