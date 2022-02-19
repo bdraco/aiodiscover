@@ -215,17 +215,22 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init the discovery hosts.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-            <span class="kn">from</span> <span class="nn">pyroute2</span> <span class="kn">import</span> <span class="n">IPRoute</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ip_route</span> <span class="o">=</span> <span class="kc">None</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span> <span class="o">=</span> <span class="n">IPRoute</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_get_sys_network_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ip_route</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+                <span class="kn">from</span> <span class="nn">pyroute2</span> <span class="kn">import</span> <span class="n">IPRoute</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ip_route</span> <span class="o">=</span> <span class="n">IPRoute</span><span class="p">()</span>
+        <span class="n">sys_network_data</span> <span class="o">=</span> <span class="n">SystemNetworkData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ip_route</span><span class="p">)</span>
+        <span class="n">sys_network_data</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">sys_network_data</span>
 
 <div class="viewcode-block" id="DiscoverHosts.async_discover"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts.async_discover">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_discover</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Discover hosts on the network by ARP and PTR lookup.&quot;&quot;&quot;</span>
-        <span class="n">sys_network_data</span> <span class="o">=</span> <span class="n">SystemNetworkData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">)</span>
         <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
-        <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">setup</span><span class="p">)</span>
+        <span class="n">sys_network_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">loop</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_sys_network_data</span><span class="p">)</span>
         <span class="n">network</span> <span class="o">=</span> <span class="n">sys_network_data</span><span class="o">.</span><span class="n">network</span>
         <span class="k">if</span> <span class="n">network</span><span class="o">.</span><span class="n">num_addresses</span> <span class="o">&gt;</span> <span class="n">MAX_ADDRESSES</span><span class="p">:</span>
             <span class="n">_LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
