@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 import asyncio
 import re
 import socket
 import sys
 from contextlib import suppress
-from ipaddress import ip_address, ip_network
+from ipaddress import IPv4Network, ip_address, ip_network
+from typing import Any, Iterable
 
-import ifaddr
+import ifaddr  # type: ignore
 
 # Some MAC addresses will drop the leading zero so
 # our mac validation must allow a single char
@@ -30,11 +33,15 @@ PRIVATE_AND_LOCAL_NETWORKS = (
     ip_network("192.168.0.0/16"),
 )
 
+DEFAULT_TARGET = "10.255.255.255"
+MDNS_TARGET_IP = "224.0.0.251"
+PUBLIC_TARGET_IP = "8.8.8.8"
+LOOPBACK_TARGET_IP = "127.0.0.1"
 
-IGNORE_MACS = ("00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff")
+IGNORE_MACS = {"00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff"}
 
 
-def load_resolv_conf():
+def load_resolv_conf() -> list[str]:
     """Load the resolv.conf."""
     with open("/etc/resolv.conf") as file:
         lines = tuple(file)
@@ -54,11 +61,12 @@ def load_resolv_conf():
     return list(nameservers)
 
 
-def get_local_ip():
+def get_local_ip(target: str = DEFAULT_TARGET) -> str | None:
     """Find the local ip address."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.setblocking(False)
     try:
-        s.connect(("10.255.255.255", 1))
+        s.connect((target, 1))
         return s.getsockname()[0]
     except Exception:
         return None
@@ -66,7 +74,7 @@ def get_local_ip():
         s.close()
 
 
-def get_network(local_ip, adapters):
+def get_network(local_ip: str, adapters: Any) -> IPv4Network:
     """Search adapters for the network and broadcast ip."""
     network_prefix = (
         get_ip_prefix_from_adapters(local_ip, adapters) or DEFAULT_NETWORK_PREFIX
@@ -74,7 +82,7 @@ def get_network(local_ip, adapters):
     return ip_network(f"{local_ip}/{network_prefix}", False)
 
 
-def get_ip_prefix_from_adapters(local_ip, adapters):
+def get_ip_prefix_from_adapters(local_ip: str, adapters: Any) -> int | None:
     """Find the nework prefix for an adapter."""
     for adapter in adapters:
         for ip in adapter.ips:
@@ -83,19 +91,19 @@ def get_ip_prefix_from_adapters(local_ip, adapters):
     return None
 
 
-def get_attrs_key(data, key):
+def get_attrs_key(data: Any, key: Any) -> Any:
     """Lookup an attrs key in pyroute2 data."""
     for attr_key, attr_value in data["attrs"]:
         if attr_key == key:
             return attr_value
 
 
-def get_router_ip(ipr):
+def get_router_ip(ipr: Any) -> Any:
     """Obtain the router ip from the default route."""
     return get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
 
 
-def _fill_neighbor(neighbours, ip, mac):
+def _fill_neighbor(neighbours: dict[str, str], ip: str, mac: str) -> None:
     """Add a neighbor if it is valid."""
     try:
         ip_addr = ip_address(ip)
@@ -126,17 +134,17 @@ def async_populate_arp(ip_addresses):
 class SystemNetworkData:
     """Gather system network data."""
 
-    def __init__(self, ip_route):
+    def __init__(self, ip_route: Any, local_ip: str | None = None) -> None:
         """Init system network data."""
         self.ip_route = ip_route
-        self.local_ip = None
-        self.broadcast_ip = None
-        self.router_ip = None
-        self.network = None
-        self.adapters = None
-        self.nameservers = []
+        self.local_ip = local_ip
+        self.broadcast_ip: str | None = None
+        self.router_ip: str | None = None
+        self.network: IPv4Network | None = None
+        self.adapters: Any = None
+        self.nameservers: list[str] = []
 
-    def setup(self):
+    def setup(self) -> None:
         """Obtain the local network data."""
         try:
             resolvers = load_resolv_conf()
@@ -149,9 +157,15 @@ class SystemNetworkData:
                 for ip_addr in resolvers
                 if any(ip_addr in network for network in PRIVATE_AND_LOCAL_NETWORKS)
             ]
-
         self.adapters = ifaddr.get_adapters()
-        self.local_ip = get_local_ip()
+        if not self.local_ip:
+            self.local_ip = (
+                get_local_ip(DEFAULT_TARGET)
+                or get_local_ip(MDNS_TARGET_IP)
+                or get_local_ip(PUBLIC_TARGET_IP)
+                or get_local_ip(LOOPBACK_TARGET_IP)
+            )
+        assert self.local_ip is not None
         self.network = get_network(self.local_ip, self.adapters)
         if self.ip_route:
             try:
@@ -161,14 +175,14 @@ class SystemNetworkData:
         if not self.router_ip:
             # On MacOS netifaces is the only reliable way to get the default gateway
             with suppress(Exception):
-                import netifaces  # pylint: disable=import-outside-toplevel
+                import netifaces  # type: ignore # pylint: disable=import-outside-toplevel
 
                 self.router_ip = netifaces.gateways()["default"][netifaces.AF_INET][0]
         if not self.router_ip:
             network_address = str(self.network.network_address)
             self.router_ip = f"{network_address[:-1]}1"
 
-    async def async_get_neighbors(self, ips):
+    async def async_get_neighbors(self, ips: Iterable[str]) -> dict[str, str]:
         """Get neighbors with best available method."""
         neighbors = await self._async_get_neighbors()
         ips_missing_arp = [ip for ip in ips if ip not in neighbors]
@@ -180,15 +194,15 @@ class SystemNetworkData:
         neighbors.update(await self._async_get_neighbors())
         return neighbors
 
-    async def _async_get_neighbors(self):
+    async def _async_get_neighbors(self) -> dict[str, str]:
         """Get neighbors from the arp table."""
         if self.ip_route:
             return await self._async_get_neighbors_ip_route()
         return await self._async_get_neighbors_arp()
 
-    async def _async_get_neighbors_arp(self):
+    async def _async_get_neighbors_arp(self) -> dict[str, str]:
         """Get neighbors with arp command."""
-        neighbours = {}
+        neighbours: dict[str, str] = {}
         arp = await asyncio.create_subprocess_exec(
             "arp",
             "-a",
@@ -202,7 +216,7 @@ class SystemNetworkData:
         except asyncio.TimeoutError:
             if arp:
                 with suppress(TypeError):
-                    await arp.kill()
+                    await arp.kill()  # type: ignore
                 del arp
             return neighbours
         except AttributeError:
