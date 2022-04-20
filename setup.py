@@ -42,7 +42,7 @@ requirements = [
     "netifaces>=0.11.0",
     "dnspython>=2.1.0",
     "ifaddr",
-    "pyroute2>=0.5.18,!=0.6.1",
+    "pyroute2>=0.6.9",
 ]
 
 extra_requirements = {
