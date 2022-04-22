@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import asyncio
-from ipaddress import IPv4Network, ip_address
+from ipaddress import IPv4Address, IPv4Network, ip_address
 from unittest.mock import MagicMock, patch
 
 import pytest
+from dns.message import Message
 
 from aiodiscover import discovery
 
@@ -114,3 +115,39 @@ async def test_async_query_for_ptr_with_proto():
         ptr_resolver, [ip_address("1.2.3.4")]
     )
     assert 35926 in ptr_resolver.responses
+
+
+@pytest.mark.asyncio
+async def test_async_query_for_ptrs():
+    """Test async_query_for_ptrs handles missing ips."""
+    loop = asyncio.get_running_loop()
+    destination = ("192.168.107.1", discovery.DNS_PORT)
+    ptr_resolver = discovery.PTRResolver(destination)
+    ptr_resolver.transport = MagicMock()
+
+    response_count = 0
+
+    def _respond(*args, **kwargs):
+        nonlocal response_count
+        response_count += 1
+        ptr_resolver.datagram_received(UDP_PTR_RESOLUTION_OCTETS, destination)
+        return MagicMock(id=35926 if response_count != 2 else 1234)
+
+    async def _mock_create_datagram_endpoint(func, remote_addr=None):
+        return ptr_resolver.transport, ptr_resolver
+
+    with patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0), patch.object(
+        loop, "create_datagram_endpoint", _mock_create_datagram_endpoint
+    ), patch("aiodiscover.discovery.async_generate_ptr_query", _respond):
+        response = await discovery.async_query_for_ptrs(
+            "192.168.107.1",
+            [
+                IPv4Address("192.168.107.2"),
+                IPv4Address("192.168.107.3"),
+                IPv4Address("192.168.107.4"),
+            ],
+        )
+
+    assert isinstance(response[0], Message)
+    assert response[1] is None
+    assert isinstance(response[2], Message)
