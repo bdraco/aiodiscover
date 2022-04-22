@@ -128,7 +128,7 @@ async def async_query_for_ptr_with_proto(
         except OSError:
             break
 
-    return [protocol.responses.get(query_for_ip[ip]) for ip in ips_to_lookup]
+    return [protocol.responses.get(query_for_ip.get(ip)) for ip in ips_to_lookup]  # type: ignore
 
 
 class DiscoverHosts:
@@ -141,9 +141,9 @@ class DiscoverHosts:
     def _get_sys_network_data(self) -> SystemNetworkData:
         if not self._ip_route:
             with suppress(Exception):
-                from pr2modules.iproute import (
+                from pr2modules.iproute import (  # type: ignore # pylint: disable=import-outside-toplevel
                     IPRoute,
-                )  # type: ignore # pylint: disable=import-outside-toplevel
+                )
 
                 self._ip_route = IPRoute()
         sys_network_data = SystemNetworkData(self._ip_route)
