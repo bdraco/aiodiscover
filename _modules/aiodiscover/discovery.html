@@ -218,7 +218,7 @@
         <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
             <span class="k">break</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">protocol</span><span class="o">.</span><span class="n">responses</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query_for_ip</span><span class="p">[</span><span class="n">ip</span><span class="p">])</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips_to_lookup</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">protocol</span><span class="o">.</span><span class="n">responses</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">query_for_ip</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ip</span><span class="p">))</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips_to_lookup</span><span class="p">]</span>  <span class="c1"># type: ignore</span></div>
 
 
 <div class="viewcode-block" id="DiscoverHosts"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts">[docs]</a><span class="k">class</span> <span class="nc">DiscoverHosts</span><span class="p">:</span>
@@ -231,9 +231,9 @@
     <span class="k">def</span> <span class="nf">_get_sys_network_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SystemNetworkData</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ip_route</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-                <span class="kn">from</span> <span class="nn">pr2modules.iproute</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="kn">from</span> <span class="nn">pr2modules.iproute</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># type: ignore # pylint: disable=import-outside-toplevel</span>
                     <span class="n">IPRoute</span><span class="p">,</span>
-                <span class="p">)</span>  <span class="c1"># type: ignore # pylint: disable=import-outside-toplevel</span>
+                <span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">_ip_route</span> <span class="o">=</span> <span class="n">IPRoute</span><span class="p">()</span>
         <span class="n">sys_network_data</span> <span class="o">=</span> <span class="n">SystemNetworkData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ip_route</span><span class="p">)</span>
