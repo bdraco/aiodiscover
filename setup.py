@@ -39,6 +39,7 @@ dev_requirements = [
 ]
 
 requirements = [
+    "async_timeout>=4.0.1",
     "netifaces>=0.11.0",
     "dnspython>=2.1.0",
     "ifaddr",
