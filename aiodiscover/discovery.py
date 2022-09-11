@@ -6,6 +6,7 @@ from contextlib import suppress
 from ipaddress import IPv4Address
 from typing import cast
 
+import async_timeout
 from dns import exception, message, rdatatype
 from dns.message import Message
 
@@ -118,9 +119,8 @@ async def async_query_for_ptr_with_proto(
         req = async_generate_ptr_query(ip)
         query_for_ip[ip] = req.id
         try:
-            await asyncio.wait_for(
-                protocol.send_query(req), timeout=DNS_RESPONSE_TIMEOUT
-            )
+            async with async_timeout.timeout(DNS_RESPONSE_TIMEOUT):
+                await protocol.send_query(req)
         except asyncio.TimeoutError:
             time_outs += 1
             if time_outs == MAX_DNS_TIMEOUT_DECLARE_DEAD_NAMESERVER:

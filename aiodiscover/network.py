@@ -8,6 +8,7 @@ from contextlib import suppress
 from ipaddress import IPv4Network, ip_address, ip_network
 from typing import Any, Iterable
 
+import async_timeout
 import ifaddr  # type: ignore
 
 # Some MAC addresses will drop the leading zero so
@@ -212,7 +213,8 @@ class SystemNetworkData:
             stderr=asyncio.subprocess.PIPE,
         )
         try:
-            out_data, _ = await asyncio.wait_for(arp.communicate(), ARP_TIMEOUT)
+            async with async_timeout.timeout(ARP_TIMEOUT):
+                out_data, _ = await arp.communicate()
         except asyncio.TimeoutError:
             if arp:
                 with suppress(TypeError):
