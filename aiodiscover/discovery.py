@@ -10,7 +10,7 @@ from typing import Any, cast
 
 import async_timeout
 from dns import exception, message, rdatatype
-from dns.message import Message
+from dns.message import Message, QueryMessage
 from dns.name import Name
 
 from .network import SystemNetworkData
@@ -78,7 +78,7 @@ class PTRResolver:
         self.transport = transport
 
     def datagram_received(self, data: bytes, addr: tuple[str, int]) -> None:
-        """Response recieved."""
+        """Response received."""
         if addr != self.destination:
             return
         try:
@@ -122,9 +122,10 @@ async def async_query_for_ptrs(
         transport.close()
 
 
-def async_generate_ptr_query(ip: IPv4Address) -> Message:
-    """Generate a ptr query with the next random id."""
-    return message.make_query(ip.reverse_pointer, rdatatype.PTR)
+def async_mutate_ptr_query(req: QueryMessage, ip: IPv4Address, id_: int) -> Message:
+    """Mutate a ptr query with the next random id."""
+    req.id = id_
+    req.question[0].name = _get_name(ip.reverse_pointer)
 
 
 @lru_cache(maxsize=MAX_ADDRESSES)
@@ -142,14 +143,13 @@ async def async_query_for_ptr_with_proto(
     time_outs = 0
     query_for_ip = {}
     used_ids = {0}
-    req = async_generate_ptr_query(ips_to_lookup[0])
+    req = message.make_query(ips_to_lookup[0].reverse_pointer, rdatatype.PTR)
     id_ = 0
     for ip in ips_to_lookup:
         while id_ in used_ids:
             id_ = random.randint(1, 65535)
         used_ids.add(id_)
-        req.id = id_
-        req.question[0].name = _get_name(ip.reverse_pointer)
+        async_mutate_ptr_query(req, ip, id_)
         query_for_ip[ip] = id_
         try:
             async with async_timeout.timeout(DNS_RESPONSE_TIMEOUT):

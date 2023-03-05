@@ -5,6 +5,7 @@ from ipaddress import IPv4Address, IPv4Network, ip_address
 from unittest.mock import MagicMock, patch
 
 import pytest
+from dns import message, rdatatype
 from dns.message import Message
 
 from aiodiscover import discovery
@@ -97,7 +98,7 @@ async def test_ptr_resolver_error_received():
     ptr_resolver.transport = MagicMock()
     loop = asyncio.get_running_loop()
     loop.call_later(0.01, ptr_resolver.error_received, ConnectionRefusedError)
-    req = discovery.async_generate_ptr_query(ip_address("1.2.3.4"))
+    req = message.make_query(ip_address("1.2.3.4").reverse_pointer, rdatatype.PTR)
     with pytest.raises(ConnectionRefusedError):
         await ptr_resolver.send_query(req)
 
@@ -127,18 +128,19 @@ async def test_async_query_for_ptrs():
 
     response_count = 0
 
-    def _respond(*args, **kwargs):
+    async def _respond(req: Message):
         nonlocal response_count
         response_count += 1
         ptr_resolver.datagram_received(UDP_PTR_RESOLUTION_OCTETS, destination)
-        return MagicMock(id=35926 if response_count != 2 else 1234)
+        if response_count != 2:
+            ptr_resolver.responses[req.id] = ptr_resolver.responses[35926]
 
     async def _mock_create_datagram_endpoint(func, remote_addr=None):
         return ptr_resolver.transport, ptr_resolver
 
     with patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0), patch.object(
         loop, "create_datagram_endpoint", _mock_create_datagram_endpoint
-    ), patch("aiodiscover.discovery.async_generate_ptr_query", _respond):
+    ), patch.object(ptr_resolver, "send_query", _respond):
         response = await discovery.async_query_for_ptrs(
             "192.168.107.1",
             [
