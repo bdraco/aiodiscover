@@ -26,14 +26,13 @@ DNS_PORT = 53
 _LOGGER = logging.getLogger(__name__)
 
 
-
 class FastName(Name):
     """A fast name."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Init."""
         super().__init__(*args, **kwargs)
-        object.__setattr__(self,"_to_wire",super().to_wire())
+        object.__setattr__(self, "_to_wire", super().to_wire())
 
     def to_wire(self, *args: Any, **kwargs: Any) -> bytes:
         """Convert to wire format."""
@@ -126,10 +125,14 @@ def async_generate_ptr_query(ip: IPv4Address) -> Message:
     """Generate a ptr query with the next random id."""
     return message.make_query(ip.reverse_pointer, rdatatype.PTR)
 
+
 @lru_cache(maxsize=MAX_ADDRESSES)
 def _get_name(reverse_pointer: str) -> FastName:
     """Get the FastName for a reverse pointer."""
-    return FastName((label.encode('ascii') for label in (*reverse_pointer.split("."), "")))
+    return FastName(
+        (label.encode("ascii") for label in (*reverse_pointer.split("."), ""))
+    )
+
 
 async def async_query_for_ptr_with_proto(
     protocol: PTRResolver, ips_to_lookup: list[IPv4Address]
