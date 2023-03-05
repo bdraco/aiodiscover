@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import random
 from contextlib import suppress
+from functools import lru_cache
 from ipaddress import IPv4Address
-from typing import cast
+from typing import Any, cast
 
 import async_timeout
 from dns import exception, message, rdatatype
-from dns.message import Message
+from dns.message import Message, QueryMessage
+from dns.name import Name
 
 from .network import SystemNetworkData
 
@@ -22,6 +25,21 @@ MAX_DNS_TIMEOUT_DECLARE_DEAD_NAMESERVER = 5
 DNS_PORT = 53
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class FastName(Name):
+    """A fast name."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Init."""
+        super().__init__(*args, **kwargs)
+        object.__setattr__(self, "_to_wire", super().to_wire())
+
+    def to_wire(self, *args: Any, **kwargs: Any) -> bytes:
+        """Convert to wire format."""
+        if args or kwargs:
+            return super().to_wire(*args, **kwargs)
+        return self._to_wire
 
 
 def short_hostname(hostname: str) -> str:
@@ -60,7 +78,7 @@ class PTRResolver:
         self.transport = transport
 
     def datagram_received(self, data: bytes, addr: tuple[str, int]) -> None:
-        """Response recieved."""
+        """Response received."""
         if addr != self.destination:
             return
         try:
@@ -104,9 +122,18 @@ async def async_query_for_ptrs(
         transport.close()
 
 
-def async_generate_ptr_query(ip):
-    """Generate a ptr query with the next random id."""
-    return message.make_query(ip.reverse_pointer, rdatatype.PTR)
+def async_mutate_ptr_query(req: QueryMessage, ip: IPv4Address, id_: int) -> Message:
+    """Mutate a ptr query with the next random id."""
+    req.id = id_
+    req.question[0].name = _get_name(ip.reverse_pointer)
+
+
+@lru_cache(maxsize=MAX_ADDRESSES)
+def _get_name(reverse_pointer: str) -> FastName:
+    """Get the FastName for a reverse pointer."""
+    return FastName(
+        (label.encode("ascii") for label in (*reverse_pointer.split("."), ""))
+    )
 
 
 async def async_query_for_ptr_with_proto(
@@ -115,9 +142,15 @@ async def async_query_for_ptr_with_proto(
     """Send and receiver the PTR queries."""
     time_outs = 0
     query_for_ip = {}
+    used_ids = {0}
+    req = message.make_query(ips_to_lookup[0].reverse_pointer, rdatatype.PTR)
+    id_ = 0
     for ip in ips_to_lookup:
-        req = async_generate_ptr_query(ip)
-        query_for_ip[ip] = req.id
+        while id_ in used_ids:
+            id_ = random.randint(1, 65535)
+        used_ids.add(id_)
+        async_mutate_ptr_query(req, ip, id_)
+        query_for_ip[ip] = id_
         try:
             async with async_timeout.timeout(DNS_RESPONSE_TIMEOUT):
                 await protocol.send_query(req)
@@ -141,9 +174,9 @@ class DiscoverHosts:
     def _get_sys_network_data(self) -> SystemNetworkData:
         if not self._ip_route:
             with suppress(Exception):
-                from pr2modules.iproute import (  # type: ignore # pylint: disable=import-outside-toplevel
+                from pr2modules.iproute import (
                     IPRoute,
-                )
+                )  # type: ignore # pylint: disable=import-outside-toplevel
 
                 self._ip_route = IPRoute()
         sys_network_data = SystemNetworkData(self._ip_route)

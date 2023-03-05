@@ -12,8 +12,9 @@ pr = cProfile.Profile()
 pr.enable()
 
 discover_hosts = DiscoverHosts()
-hosts = asyncio.run(discover_hosts.async_discover())
-pprint.pprint(hosts)
+for _ in range(10):
+    hosts = asyncio.run(discover_hosts.async_discover())
+    pprint.pprint(hosts)
 
 pr.disable()
 pr.create_stats()
