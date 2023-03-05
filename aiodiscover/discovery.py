@@ -6,7 +6,7 @@ import random
 from contextlib import suppress
 from functools import lru_cache
 from ipaddress import IPv4Address
-from typing import Any, Iterable, Union, cast
+from typing import Any, cast
 
 import async_timeout
 from dns import exception, message, rdatatype
