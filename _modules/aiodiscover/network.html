@@ -32,10 +32,8 @@
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -101,9 +99,32 @@
 <li class="toctree-l1"><a class="reference internal" href="../../modules.html">Package modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../aiodiscover.html">aiodiscover package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.discovery">aiodiscover.discovery module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.network">aiodiscover.network module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.discovery">aiodiscover.discovery module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.DiscoverHosts"><code class="docutils literal notranslate"><span class="pre">DiscoverHosts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.FastName"><code class="docutils literal notranslate"><span class="pre">FastName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.PTRResolver"><code class="docutils literal notranslate"><span class="pre">PTRResolver</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.async_mutate_ptr_query"><code class="docutils literal notranslate"><span class="pre">async_mutate_ptr_query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.async_query_for_ptr_with_proto"><code class="docutils literal notranslate"><span class="pre">async_query_for_ptr_with_proto()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.async_query_for_ptrs"><code class="docutils literal notranslate"><span class="pre">async_query_for_ptrs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.dns_message_short_hostname"><code class="docutils literal notranslate"><span class="pre">dns_message_short_hostname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.short_hostname"><code class="docutils literal notranslate"><span class="pre">short_hostname()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.network">aiodiscover.network module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData"><code class="docutils literal notranslate"><span class="pre">SystemNetworkData</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.async_populate_arp"><code class="docutils literal notranslate"><span class="pre">async_populate_arp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.get_attrs_key"><code class="docutils literal notranslate"><span class="pre">get_attrs_key()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.get_ip_prefix_from_adapters"><code class="docutils literal notranslate"><span class="pre">get_ip_prefix_from_adapters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.get_local_ip"><code class="docutils literal notranslate"><span class="pre">get_local_ip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.get_network"><code class="docutils literal notranslate"><span class="pre">get_network()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.get_router_ip"><code class="docutils literal notranslate"><span class="pre">get_router_ip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.load_resolv_conf"><code class="docutils literal notranslate"><span class="pre">load_resolv_conf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -226,7 +247,7 @@
 
 
 <div class="viewcode-block" id="load_resolv_conf"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.load_resolv_conf">[docs]</a><span class="k">def</span> <span class="nf">load_resolv_conf</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Load the resolv.conf.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load the resolv.conf.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/etc/resolv.conf&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
     <span class="n">nameservers</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -246,7 +267,7 @@
 
 
 <div class="viewcode-block" id="get_local_ip"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_local_ip">[docs]</a><span class="k">def</span> <span class="nf">get_local_ip</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_TARGET</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Find the local ip address.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the local ip address.&quot;&quot;&quot;</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
     <span class="n">s</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -259,7 +280,7 @@
 
 
 <div class="viewcode-block" id="get_network"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_network">[docs]</a><span class="k">def</span> <span class="nf">get_network</span><span class="p">(</span><span class="n">local_ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">adapters</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IPv4Network</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Search adapters for the network and broadcast ip.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search adapters for the network and broadcast ip.&quot;&quot;&quot;</span>
     <span class="n">network_prefix</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">get_ip_prefix_from_adapters</span><span class="p">(</span><span class="n">local_ip</span><span class="p">,</span> <span class="n">adapters</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DEFAULT_NETWORK_PREFIX</span>
     <span class="p">)</span>
@@ -267,7 +288,7 @@
 
 
 <div class="viewcode-block" id="get_ip_prefix_from_adapters"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_ip_prefix_from_adapters">[docs]</a><span class="k">def</span> <span class="nf">get_ip_prefix_from_adapters</span><span class="p">(</span><span class="n">local_ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">adapters</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Find the nework prefix for an adapter.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the nework prefix for an adapter.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">adapter</span> <span class="ow">in</span> <span class="n">adapters</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">adapter</span><span class="o">.</span><span class="n">ips</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">local_ip</span> <span class="o">==</span> <span class="n">ip</span><span class="o">.</span><span class="n">ip</span><span class="p">:</span>
@@ -276,19 +297,19 @@
 
 
 <div class="viewcode-block" id="get_attrs_key"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_attrs_key">[docs]</a><span class="k">def</span> <span class="nf">get_attrs_key</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Lookup an attrs key in pyroute2 data.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Lookup an attrs key in pyroute2 data.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">attr_key</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;attrs&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">attr_key</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">attr_value</span></div>
 
 
 <div class="viewcode-block" id="get_router_ip"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_router_ip">[docs]</a><span class="k">def</span> <span class="nf">get_router_ip</span><span class="p">(</span><span class="n">ipr</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Obtain the router ip from the default route.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the router ip from the default route.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_attrs_key</span><span class="p">(</span><span class="n">ipr</span><span class="o">.</span><span class="n">get_default_routes</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;RTA_GATEWAY&quot;</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_fill_neighbor</span><span class="p">(</span><span class="n">neighbours</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mac</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Add a neighbor if it is valid.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a neighbor if it is valid.&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">ip_addr</span> <span class="o">=</span> <span class="n">ip_address</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -304,7 +325,7 @@
 
 
 <div class="viewcode-block" id="async_populate_arp"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.async_populate_arp">[docs]</a><span class="k">def</span> <span class="nf">async_populate_arp</span><span class="p">(</span><span class="n">ip_addresses</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Send an empty packet to a host to populate the arp cache.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Send an empty packet to a host to populate the arp cache.&quot;&quot;&quot;</span>
     <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">sock</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">ip_addresses</span><span class="p">:</span>
@@ -316,10 +337,10 @@
 
 
 <div class="viewcode-block" id="SystemNetworkData"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData">[docs]</a><span class="k">class</span> <span class="nc">SystemNetworkData</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Gather system network data.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gather system network data.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip_route</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">local_ip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Init system network data.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init system network data.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span> <span class="o">=</span> <span class="n">ip_route</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_ip</span> <span class="o">=</span> <span class="n">local_ip</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">broadcast_ip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -329,7 +350,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nameservers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="SystemNetworkData.setup"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Obtain the local network data.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain the local network data.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">resolvers</span> <span class="o">=</span> <span class="n">load_resolv_conf</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
@@ -367,7 +388,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network_address</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">1&quot;</span></div>
 
 <div class="viewcode-block" id="SystemNetworkData.async_get_neighbors"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.async_get_neighbors">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ips</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get neighbors with best available method.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get neighbors with best available method.&quot;&quot;&quot;</span>
         <span class="n">neighbors</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors</span><span class="p">()</span>
         <span class="n">ips_missing_arp</span> <span class="o">=</span> <span class="p">[</span><span class="n">ip</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="n">ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ips_missing_arp</span><span class="p">:</span>
@@ -379,13 +400,13 @@
         <span class="k">return</span> <span class="n">neighbors</span></div>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get neighbors from the arp table.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get neighbors from the arp table.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ip_route</span><span class="p">:</span>
             <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors_ip_route</span><span class="p">()</span>
         <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors_arp</span><span class="p">()</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors_arp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Get neighbors with arp command.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get neighbors with arp command.&quot;&quot;&quot;</span>
         <span class="n">neighbours</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">arp</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_subprocess_exec</span><span class="p">(</span>
             <span class="s2">&quot;arp&quot;</span><span class="p">,</span>
@@ -419,7 +440,7 @@
         <span class="k">return</span> <span class="n">neighbours</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors_ip_route</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get neighbors with pyroute2.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get neighbors with pyroute2.&quot;&quot;&quot;</span>
         <span class="n">neighbours</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span>
         <span class="c1"># This shouldn&#39;t ever block but it does</span>
