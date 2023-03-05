@@ -174,7 +174,7 @@ class DiscoverHosts:
     def _get_sys_network_data(self) -> SystemNetworkData:
         if not self._ip_route:
             with suppress(Exception):
-                from pr2modules.iproute import (
+                from pyroute2.iproute import (
                     IPRoute,
                 )  # type: ignore # pylint: disable=import-outside-toplevel
 
