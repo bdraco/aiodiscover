@@ -25,8 +25,6 @@ DNS_PORT = 53
 
 _LOGGER = logging.getLogger(__name__)
 
-_WIRE_CACHE = dict[str, bytes]
-
 
 
 class FastName(Name):
