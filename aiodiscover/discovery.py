@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Iterable, Union, Any
-from functools import lru_cache
 import logging
-from contextlib import suppress
-from ipaddress import IPv4Address
-from typing import cast
 import random
+from contextlib import suppress
+from functools import lru_cache
+from ipaddress import IPv4Address
+from typing import Any, Iterable, Union, cast
+
 import async_timeout
 from dns import exception, message, rdatatype
 from dns.message import Message
 from dns.name import Name
+
 from .network import SystemNetworkData
 
 HOSTNAME = "hostname"
@@ -173,9 +174,9 @@ class DiscoverHosts:
     def _get_sys_network_data(self) -> SystemNetworkData:
         if not self._ip_route:
             with suppress(Exception):
-                from pr2modules.iproute import (  # type: ignore # pylint: disable=import-outside-toplevel
+                from pr2modules.iproute import (
                     IPRoute,
-                )
+                )  # type: ignore # pylint: disable=import-outside-toplevel
 
                 self._ip_route = IPRoute()
         sys_network_data = SystemNetworkData(self._ip_route)
