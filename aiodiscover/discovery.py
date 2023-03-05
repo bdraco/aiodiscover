@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import asyncio
+from typing import Iterable, Union, Any
+from functools import lru_cache
 import logging
 from contextlib import suppress
 from ipaddress import IPv4Address
 from typing import cast
-
+import random
 import async_timeout
 from dns import exception, message, rdatatype
 from dns.message import Message
-
+from dns.name import Name
 from .network import SystemNetworkData
 
 HOSTNAME = "hostname"
@@ -22,6 +24,24 @@ MAX_DNS_TIMEOUT_DECLARE_DEAD_NAMESERVER = 5
 DNS_PORT = 53
 
 _LOGGER = logging.getLogger(__name__)
+
+_WIRE_CACHE = dict[str, bytes]
+
+
+
+class FastName(Name):
+    """A fast name."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Init."""
+        super().__init__(*args, **kwargs)
+        object.__setattr__(self,"_to_wire",super().to_wire())
+
+    def to_wire(self, *args: Any, **kwargs: Any) -> bytes:
+        """Convert to wire format."""
+        if args or kwargs:
+            return super().to_wire(*args, **kwargs)
+        return self._to_wire
 
 
 def short_hostname(hostname: str) -> str:
@@ -104,10 +124,14 @@ async def async_query_for_ptrs(
         transport.close()
 
 
-def async_generate_ptr_query(ip):
+def async_generate_ptr_query(ip: IPv4Address) -> Message:
     """Generate a ptr query with the next random id."""
     return message.make_query(ip.reverse_pointer, rdatatype.PTR)
 
+@lru_cache(maxsize=MAX_ADDRESSES)
+def _get_name(reverse_pointer: str) -> FastName:
+    """Get the FastName for a reverse pointer."""
+    return FastName((label.encode('ascii') for label in (*reverse_pointer.split("."), "")))
 
 async def async_query_for_ptr_with_proto(
     protocol: PTRResolver, ips_to_lookup: list[IPv4Address]
@@ -115,9 +139,16 @@ async def async_query_for_ptr_with_proto(
     """Send and receiver the PTR queries."""
     time_outs = 0
     query_for_ip = {}
+    used_ids = {0}
+    req = async_generate_ptr_query(ips_to_lookup[0])
+    id_ = 0
     for ip in ips_to_lookup:
-        req = async_generate_ptr_query(ip)
-        query_for_ip[ip] = req.id
+        while id_ in used_ids:
+            id_ = random.randint(1, 65535)
+        used_ids.add(id_)
+        req.id = id_
+        req.question[0].name = _get_name(ip.reverse_pointer)
+        query_for_ip[ip] = id_
         try:
             async with async_timeout.timeout(DNS_RESPONSE_TIMEOUT):
                 await protocol.send_query(req)

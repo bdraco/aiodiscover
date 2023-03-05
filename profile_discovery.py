@@ -14,6 +14,8 @@ pr.enable()
 discover_hosts = DiscoverHosts()
 hosts = asyncio.run(discover_hosts.async_discover())
 pprint.pprint(hosts)
+hosts = asyncio.run(discover_hosts.async_discover())
+pprint.pprint(hosts)
 
 pr.disable()
 pr.create_stats()
