@@ -211,6 +211,7 @@ class SystemNetworkData:
             stdin=None,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
+            close_fds=False,
         )
         try:
             async with async_timeout.timeout(ARP_TIMEOUT):
