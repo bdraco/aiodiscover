@@ -106,10 +106,16 @@ class PTRResolver:
         self.responded = loop.create_future()
         self.send_id = query.id
         self.transport.sendto(query.to_wire(), self.destination)
-        self.loop.call_at(
-            loop.time() + timeout, set_exception_if_not_done, self.responded, asyncio.TimeoutError
+        handle = self.loop.call_at(
+            loop.time() + timeout,
+            set_exception_if_not_done,
+            self.responded,
+            asyncio.TimeoutError,
         )
-        await self.responded
+        try:
+            await self.responded
+        finally:
+            handle.cancel()
 
 
 async def async_query_for_ptrs(
