@@ -115,7 +115,8 @@ class PTRResolver:
         try:
             await self.responded
         finally:
-            handle.cancel()
+            if not self.responded.cancelled() and not self.responded.exception():
+                handle.cancel()
 
 
 async def async_query_for_ptrs(
