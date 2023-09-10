@@ -4,7 +4,7 @@ __author__ = "J. Nick Koston"
 __email__ = "nick@koston.org"
 # Do not edit this string manually, always use bumpversion
 # Details in CONTRIBUTING.md
-__version__ = "1.4.16"
+__version__ = "1.5.0"
 
 from .discovery import DiscoverHosts  # noqa: F401
 
