@@ -97,10 +97,10 @@ async def test_ptr_resolver_error_received():
     ptr_resolver = discovery.PTRResolver(destination)
     ptr_resolver.transport = MagicMock()
     loop = asyncio.get_running_loop()
-    loop.call_later(0.01, ptr_resolver.error_received, ConnectionRefusedError)
     req = message.make_query(ip_address("1.2.3.4").reverse_pointer, rdatatype.PTR)
+    loop.call_soon(ptr_resolver.error_received, ConnectionRefusedError)
     with pytest.raises(ConnectionRefusedError):
-        await ptr_resolver.send_query(req)
+        await ptr_resolver.send_query(req, 5.0)
 
 
 @pytest.mark.asyncio
@@ -128,7 +128,7 @@ async def test_async_query_for_ptrs():
 
     response_count = 0
 
-    async def _respond(req: Message):
+    async def _respond(req: Message, timeout: float):
         nonlocal response_count
         response_count += 1
         ptr_resolver.datagram_received(UDP_PTR_RESOLUTION_OCTETS, destination)

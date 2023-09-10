@@ -98,7 +98,7 @@ class PTRResolver:
     def error_received(self, exc: Exception) -> None:
         """Error received."""
         if not self.responded.done():
-            self.responded.set_result(exc)
+            self.responded.set_exception(exc)
 
     async def send_query(self, query: Message, timeout: float) -> None:
         """Send a query and wait for a response."""
