@@ -6,9 +6,8 @@ import random
 from contextlib import suppress
 from functools import lru_cache
 from ipaddress import IPv4Address
-from typing import Any, cast
+from typing import Any, Optional, cast
 
-import async_timeout
 from dns import exception, message, rdatatype
 from dns.message import Message, QueryMessage
 from dns.name import Name
@@ -59,6 +58,12 @@ def dns_message_short_hostname(dns_message: message.Message | None) -> str | Non
     return None
 
 
+def set_exception_if_not_done(future: asyncio.Future, exc: Exception) -> None:
+    """Set result if not done."""
+    if not future.done():
+        future.set_exception(exc)
+
+
 class PTRResolver:
     """Implement DNS PTR resolver."""
 
@@ -67,8 +72,9 @@ class PTRResolver:
         self.destination: tuple[str, int] = destination
         self.responses: dict[int, Message] = {}
         self.send_id: int | None = None
-        self.responded = asyncio.Event()
+        self.responded: Optional[asyncio.Future[None]] = None
         self.error: Exception | None = None
+        self.loop = asyncio.get_running_loop()
 
     def connection_lost(self, ex: Exception | None) -> None:
         """Connection lost."""
@@ -86,22 +92,31 @@ class PTRResolver:
         except exception.DNSException:
             return
         self.responses[msg.id] = msg
-        if msg.id == self.send_id:
-            self.responded.set()
+        if msg.id == self.send_id and not self.responded.done():
+            self.responded.set_result(None)
 
     def error_received(self, exc: Exception) -> None:
         """Error received."""
-        self.error = exc
-        self.responded.set()
+        if not self.responded.done():
+            self.responded.set_exception(exc)
 
-    async def send_query(self, query: Message) -> None:
+    async def send_query(self, query: Message, timeout: float) -> None:
         """Send a query and wait for a response."""
-        self.responded.clear()
+        loop = self.loop
+        self.responded = loop.create_future()
         self.send_id = query.id
         self.transport.sendto(query.to_wire(), self.destination)
-        await self.responded.wait()
-        if self.error:
-            raise self.error
+        handle = self.loop.call_at(
+            loop.time() + timeout,
+            set_exception_if_not_done,
+            self.responded,
+            asyncio.TimeoutError,
+        )
+        try:
+            await self.responded
+        finally:
+            if not self.responded.cancelled() and not self.responded.exception():
+                handle.cancel()
 
 
 async def async_query_for_ptrs(
@@ -152,8 +167,7 @@ async def async_query_for_ptr_with_proto(
         async_mutate_ptr_query(req, ip, id_)
         query_for_ip[ip] = id_
         try:
-            async with async_timeout.timeout(DNS_RESPONSE_TIMEOUT):
-                await protocol.send_query(req)
+            await protocol.send_query(req, DNS_RESPONSE_TIMEOUT)
         except asyncio.TimeoutError:
             time_outs += 1
             if time_outs == MAX_DNS_TIMEOUT_DECLARE_DEAD_NAMESERVER:
