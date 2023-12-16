@@ -5,10 +5,11 @@ import re
 import socket
 import sys
 from contextlib import suppress
-from ipaddress import IPv4Network, ip_address, ip_network
+from ipaddress import IPv4Network, ip_network
 from typing import Any, Iterable
 
 import ifaddr  # type: ignore
+from cached_ipaddress import cached_ip_addresses
 
 from .util import asyncio_timeout
 
@@ -21,13 +22,7 @@ ARP_TIMEOUT = 10
 
 DEFAULT_NETWORK_PREFIX = 24
 
-IGNORE_NETWORKS = (
-    ip_network("169.254.0.0/16"),
-    ip_network("127.0.0.0/8"),
-    ip_network("::1/128"),
-    ip_network("::ffff:127.0.0.0/104"),
-    ip_network("224.0.0.0/4"),
-)
+
 PRIVATE_AND_LOCAL_NETWORKS = (
     ip_network("127.0.0.0/8"),
     ip_network("10.0.0.0/8"),
@@ -56,10 +51,8 @@ def load_resolv_conf() -> list[str]:
             continue
         key, value = line.split(None, 1)
         if key == "nameserver":
-            try:
-                nameservers.add(ip_address(value))
-            except ValueError:
-                continue
+            if ip_addr := cached_ip_addresses(value):
+                nameservers.add(ip_addr)
     return list(nameservers)
 
 
@@ -107,11 +100,14 @@ def get_router_ip(ipr: Any) -> Any:
 
 def _fill_neighbor(neighbours: dict[str, str], ip: str, mac: str) -> None:
     """Add a neighbor if it is valid."""
-    try:
-        ip_addr = ip_address(ip)
-    except ValueError:
+    if not (ip_addr := cached_ip_addresses(ip)):
         return
-    if any(ip_addr in network for network in IGNORE_NETWORKS):
+    if (
+        ip_addr.is_loopback
+        or ip_addr.is_link_local
+        or ip_addr.is_multicast
+        or ip_addr.is_unspecified
+    ):
         return
     if not VALID_MAC_ADDRESS.match(mac):
         return

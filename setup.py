@@ -44,6 +44,7 @@ requirements = [
     "dnspython>=2.3.0",
     "ifaddr",
     "pyroute2>=0.7.3",
+    "cached_ipaddress>=0.2.0"
 ]
 
 extra_requirements = {
