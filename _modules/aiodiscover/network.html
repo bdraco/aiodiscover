@@ -1,93 +1,49 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>aiodiscover.network &mdash; Async Host discovery 1.4.16 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
+  <title>aiodiscover.network &mdash; Async Host discovery 1.5.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
   
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=44dfd65d"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> Async Host discovery
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            Async Host discovery
           </a>
-
-          
-            
-            
               <div class="version">
-                1.4.16
+                1.5.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
@@ -107,6 +63,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.async_query_for_ptr_with_proto"><code class="docutils literal notranslate"><span class="pre">async_query_for_ptr_with_proto()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.async_query_for_ptrs"><code class="docutils literal notranslate"><span class="pre">async_query_for_ptrs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.dns_message_short_hostname"><code class="docutils literal notranslate"><span class="pre">dns_message_short_hostname()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.set_exception_if_not_done"><code class="docutils literal notranslate"><span class="pre">set_exception_if_not_done()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.discovery.short_hostname"><code class="docutils literal notranslate"><span class="pre">short_hostname()</span></code></a></li>
 </ul>
 </li>
@@ -121,6 +78,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.network.load_resolv_conf"><code class="docutils literal notranslate"><span class="pre">load_resolv_conf()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover.util">aiodiscover.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../aiodiscover.html#module-aiodiscover">Module contents</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../aiodiscover.html#aiodiscover.get_module_version"><code class="docutils literal notranslate"><span class="pre">get_module_version()</span></code></a></li>
 </ul>
@@ -136,71 +94,31 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Async Host discovery</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-          <li><a href="../aiodiscover.html">aiodiscover</a> &raquo;</li>
-        
-      <li>aiodiscover.network</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../aiodiscover.html">aiodiscover</a></li>
+      <li class="breadcrumb-item active">aiodiscover.network</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for aiodiscover.network</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
@@ -209,11 +127,13 @@
 <span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
-<span class="kn">from</span> <span class="nn">ipaddress</span> <span class="kn">import</span> <span class="n">IPv4Network</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">,</span> <span class="n">ip_network</span>
+<span class="kn">from</span> <span class="nn">ipaddress</span> <span class="kn">import</span> <span class="n">IPv4Network</span><span class="p">,</span> <span class="n">ip_network</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span>
 
-<span class="kn">import</span> <span class="nn">async_timeout</span>
 <span class="kn">import</span> <span class="nn">ifaddr</span>  <span class="c1"># type: ignore</span>
+<span class="kn">from</span> <span class="nn">cached_ipaddress</span> <span class="kn">import</span> <span class="n">cached_ip_addresses</span>
+
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">asyncio_timeout</span>
 
 <span class="c1"># Some MAC addresses will drop the leading zero so</span>
 <span class="c1"># our mac validation must allow a single char</span>
@@ -224,13 +144,7 @@
 
 <span class="n">DEFAULT_NETWORK_PREFIX</span> <span class="o">=</span> <span class="mi">24</span>
 
-<span class="n">IGNORE_NETWORKS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;169.254.0.0/16&quot;</span><span class="p">),</span>
-    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;127.0.0.0/8&quot;</span><span class="p">),</span>
-    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;::1/128&quot;</span><span class="p">),</span>
-    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;::ffff:127.0.0.0/104&quot;</span><span class="p">),</span>
-    <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;224.0.0.0/4&quot;</span><span class="p">),</span>
-<span class="p">)</span>
+
 <span class="n">PRIVATE_AND_LOCAL_NETWORKS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;127.0.0.0/8&quot;</span><span class="p">),</span>
     <span class="n">ip_network</span><span class="p">(</span><span class="s2">&quot;10.0.0.0/8&quot;</span><span class="p">),</span>
@@ -246,7 +160,9 @@
 <span class="n">IGNORE_MACS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;00:00:00:00:00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;ff:ff:ff:ff:ff:ff&quot;</span><span class="p">}</span>
 
 
-<div class="viewcode-block" id="load_resolv_conf"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.load_resolv_conf">[docs]</a><span class="k">def</span> <span class="nf">load_resolv_conf</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="load_resolv_conf">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.load_resolv_conf">[docs]</a>
+<span class="k">def</span> <span class="nf">load_resolv_conf</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load the resolv.conf.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/etc/resolv.conf&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
@@ -259,14 +175,15 @@
             <span class="k">continue</span>
         <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;nameserver&quot;</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">nameservers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ip_address</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">ip_addr</span> <span class="o">:=</span> <span class="n">cached_ip_addresses</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="n">nameservers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ip_addr</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">nameservers</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_local_ip"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_local_ip">[docs]</a><span class="k">def</span> <span class="nf">get_local_ip</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_TARGET</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="get_local_ip">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_local_ip">[docs]</a>
+<span class="k">def</span> <span class="nf">get_local_ip</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_TARGET</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the local ip address.&quot;&quot;&quot;</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
     <span class="n">s</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -279,7 +196,10 @@
         <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_network"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_network">[docs]</a><span class="k">def</span> <span class="nf">get_network</span><span class="p">(</span><span class="n">local_ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">adapters</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IPv4Network</span><span class="p">:</span>
+
+<div class="viewcode-block" id="get_network">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_network">[docs]</a>
+<span class="k">def</span> <span class="nf">get_network</span><span class="p">(</span><span class="n">local_ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">adapters</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IPv4Network</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Search adapters for the network and broadcast ip.&quot;&quot;&quot;</span>
     <span class="n">network_prefix</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">get_ip_prefix_from_adapters</span><span class="p">(</span><span class="n">local_ip</span><span class="p">,</span> <span class="n">adapters</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DEFAULT_NETWORK_PREFIX</span>
@@ -287,7 +207,10 @@
     <span class="k">return</span> <span class="n">ip_network</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">local_ip</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">network_prefix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_ip_prefix_from_adapters"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_ip_prefix_from_adapters">[docs]</a><span class="k">def</span> <span class="nf">get_ip_prefix_from_adapters</span><span class="p">(</span><span class="n">local_ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">adapters</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="get_ip_prefix_from_adapters">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_ip_prefix_from_adapters">[docs]</a>
+<span class="k">def</span> <span class="nf">get_ip_prefix_from_adapters</span><span class="p">(</span><span class="n">local_ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">adapters</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the nework prefix for an adapter.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">adapter</span> <span class="ow">in</span> <span class="n">adapters</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">adapter</span><span class="o">.</span><span class="n">ips</span><span class="p">:</span>
@@ -296,25 +219,35 @@
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="get_attrs_key"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_attrs_key">[docs]</a><span class="k">def</span> <span class="nf">get_attrs_key</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+
+<div class="viewcode-block" id="get_attrs_key">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_attrs_key">[docs]</a>
+<span class="k">def</span> <span class="nf">get_attrs_key</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Lookup an attrs key in pyroute2 data.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">attr_key</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;attrs&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">attr_key</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">attr_value</span></div>
 
 
-<div class="viewcode-block" id="get_router_ip"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_router_ip">[docs]</a><span class="k">def</span> <span class="nf">get_router_ip</span><span class="p">(</span><span class="n">ipr</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+
+<div class="viewcode-block" id="get_router_ip">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.get_router_ip">[docs]</a>
+<span class="k">def</span> <span class="nf">get_router_ip</span><span class="p">(</span><span class="n">ipr</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Obtain the router ip from the default route.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">get_attrs_key</span><span class="p">(</span><span class="n">ipr</span><span class="o">.</span><span class="n">get_default_routes</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;RTA_GATEWAY&quot;</span><span class="p">)</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">_fill_neighbor</span><span class="p">(</span><span class="n">neighbours</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">mac</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a neighbor if it is valid.&quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">ip_addr</span> <span class="o">=</span> <span class="n">ip_address</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">ip_addr</span> <span class="o">:=</span> <span class="n">cached_ip_addresses</span><span class="p">(</span><span class="n">ip</span><span class="p">)):</span>
         <span class="k">return</span>
-    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ip_addr</span> <span class="ow">in</span> <span class="n">network</span> <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">IGNORE_NETWORKS</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">ip_addr</span><span class="o">.</span><span class="n">is_loopback</span>
+        <span class="ow">or</span> <span class="n">ip_addr</span><span class="o">.</span><span class="n">is_link_local</span>
+        <span class="ow">or</span> <span class="n">ip_addr</span><span class="o">.</span><span class="n">is_multicast</span>
+        <span class="ow">or</span> <span class="n">ip_addr</span><span class="o">.</span><span class="n">is_unspecified</span>
+    <span class="p">):</span>
         <span class="k">return</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">VALID_MAC_ADDRESS</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">mac</span><span class="p">):</span>
         <span class="k">return</span>
@@ -324,7 +257,9 @@
     <span class="n">neighbours</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="n">mac</span>
 
 
-<div class="viewcode-block" id="async_populate_arp"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.async_populate_arp">[docs]</a><span class="k">def</span> <span class="nf">async_populate_arp</span><span class="p">(</span><span class="n">ip_addresses</span><span class="p">):</span>
+<div class="viewcode-block" id="async_populate_arp">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.async_populate_arp">[docs]</a>
+<span class="k">def</span> <span class="nf">async_populate_arp</span><span class="p">(</span><span class="n">ip_addresses</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Send an empty packet to a host to populate the arp cache.&quot;&quot;&quot;</span>
     <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">sock</span><span class="o">.</span><span class="n">setblocking</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -336,7 +271,10 @@
     <span class="k">return</span> <span class="n">sock</span></div>
 
 
-<div class="viewcode-block" id="SystemNetworkData"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData">[docs]</a><span class="k">class</span> <span class="nc">SystemNetworkData</span><span class="p">:</span>
+
+<div class="viewcode-block" id="SystemNetworkData">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData">[docs]</a>
+<span class="k">class</span> <span class="nc">SystemNetworkData</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gather system network data.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip_route</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">local_ip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -349,7 +287,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">adapters</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nameservers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="SystemNetworkData.setup"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="SystemNetworkData.setup">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.setup">[docs]</a>
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain the local network data.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">resolvers</span> <span class="o">=</span> <span class="n">load_resolv_conf</span><span class="p">()</span>
@@ -387,7 +327,10 @@
             <span class="n">network_address</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">network_address</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">router_ip</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">network_address</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">1&quot;</span></div>
 
-<div class="viewcode-block" id="SystemNetworkData.async_get_neighbors"><a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.async_get_neighbors">[docs]</a>    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ips</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+
+<div class="viewcode-block" id="SystemNetworkData.async_get_neighbors">
+<a class="viewcode-back" href="../../aiodiscover.html#aiodiscover.network.SystemNetworkData.async_get_neighbors">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ips</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get neighbors with best available method.&quot;&quot;&quot;</span>
         <span class="n">neighbors</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors</span><span class="p">()</span>
         <span class="n">ips_missing_arp</span> <span class="o">=</span> <span class="p">[</span><span class="n">ip</span> <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">ips</span> <span class="k">if</span> <span class="n">ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">]</span>
@@ -398,6 +341,7 @@
         <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="n">neighbors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_async_get_neighbors</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">neighbors</span></div>
+
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_async_get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get neighbors from the arp table.&quot;&quot;&quot;</span>
@@ -418,7 +362,7 @@
             <span class="n">close_fds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">async</span> <span class="k">with</span> <span class="n">async_timeout</span><span class="o">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">ARP_TIMEOUT</span><span class="p">):</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio_timeout</span><span class="p">(</span><span class="n">ARP_TIMEOUT</span><span class="p">):</span>
                 <span class="n">out_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="k">await</span> <span class="n">arp</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">arp</span><span class="p">:</span>
@@ -459,49 +403,34 @@
                 <span class="n">_fill_neighbor</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">mac</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">neighbours</span></div>
+
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, J. Nick Koston.
-
-    </p>
+    <p>&#169; Copyright 2021, J. Nick Koston.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
