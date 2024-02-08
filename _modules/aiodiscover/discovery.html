@@ -187,7 +187,7 @@
         <span class="k">if</span> <span class="n">answer</span><span class="o">.</span><span class="n">rdtype</span> <span class="o">!=</span> <span class="n">rdatatype</span><span class="o">.</span><span class="n">PTR</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">answer</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">to_text</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">short_hostname</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">to_unicode</span><span class="p">())</span>
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
