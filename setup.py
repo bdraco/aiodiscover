@@ -8,9 +8,7 @@ from setuptools import find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-setup_requirements = [
-    "pytest-runner>=5.2",
-]
+setup_requirements = []
 
 test_requirements = [
     "pytest-asyncio",
@@ -30,7 +28,6 @@ dev_requirements = [
     "coverage>=5.1",
     "ipython>=7.15.0",
     "m2r2>=0.2.7",
-    "pytest-runner>=5.2",
     "Sphinx>=3.4.3",
     "sphinx_rtd_theme>=0.5.1",
     "tox>=3.15.2",
