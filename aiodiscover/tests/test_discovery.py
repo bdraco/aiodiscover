@@ -16,6 +16,12 @@ UDP_PTR_RESOLUTION_OCTETS = (
     b"\x00(\x1bBroadlink_RMPROSUB-cc-ce-9f\x06koston\x03org\x00"
 )
 
+UDP_PTR_RESOLUTION_OCTETS_IDNA = (
+ b'E\xca\x85\x80\x00\x01\x00\x01\x00\x00\x00\x00\x03237\x03209\x03168\x03192'
+ b'\x07in-addr\x04arpa\x00\x00\x0c\x00\x01\xc0\x0c\x00\x0c\x00\x01'
+ b'\x00\x00\x00\x00\x00\x1c\x0fAlxGarageSwitch\x06koston\x03org\x00'
+)
+
 
 @pytest.mark.asyncio
 async def test_async_discover_hosts():
@@ -87,6 +93,19 @@ async def test_ptr_resolver_can_parse():
     assert (
         discovery.dns_message_short_hostname(ptr_resolver.responses[35926]).lower()
         == "broadlink_rmprosub-cc-ce-9f"
+    )
+
+
+@pytest.mark.asyncio
+async def test_ptr_resolver_can_parse_idna():
+    """Test that the PTRResolver can parse a response."""
+    destination = ("192.168.107.1", discovery.DNS_PORT)
+    ptr_resolver = discovery.PTRResolver(destination)
+    ptr_resolver.datagram_received(UDP_PTR_RESOLUTION_OCTETS_IDNA, destination)
+    assert 17866 in ptr_resolver.responses
+    assert (
+        discovery.dns_message_short_hostname(ptr_resolver.responses[17866]).lower()
+        == "alxgarageswitch"
     )
 
 
