@@ -54,7 +54,7 @@ def dns_message_short_hostname(dns_message: message.Message | None) -> str | Non
         if answer.rdtype != rdatatype.PTR:
             continue
         for item in answer.items:
-            return short_hostname(item.target.to_text())
+            return short_hostname(item.target.to_unicode())
     return None
 
 
