@@ -6,13 +6,15 @@ import socket
 import sys
 from contextlib import suppress
 from ipaddress import IPv4Network, ip_network
-from typing import Any, Iterable
+from typing import TYPE_CHECKING, Any, Iterable
 
 import ifaddr  # type: ignore
 from cached_ipaddress import cached_ip_addresses
 
 from .util import asyncio_timeout
 
+if TYPE_CHECKING:
+    from pyroute2.iproute import IPRoute
 # Some MAC addresses will drop the leading zero so
 # our mac validation must allow a single char
 VALID_MAC_ADDRESS = re.compile("^([0-9A-Fa-f]{1,2}[:-]){5}([0-9A-Fa-f]{1,2})$")
@@ -93,7 +95,7 @@ def get_attrs_key(data: Any, key: Any) -> Any:
             return attr_value
 
 
-def get_router_ip(ipr: Any) -> Any:
+def get_router_ip(ipr: "IPRoute") -> Any:
     """Obtain the router ip from the default route."""
     return get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
 
@@ -132,7 +134,7 @@ def async_populate_arp(ip_addresses):
 class SystemNetworkData:
     """Gather system network data."""
 
-    def __init__(self, ip_route: Any, local_ip: str | None = None) -> None:
+    def __init__(self, ip_route: "IPRoute" | None, local_ip: str | None = None) -> None:
         """Init system network data."""
         self.ip_route = ip_route
         self.local_ip = local_ip
