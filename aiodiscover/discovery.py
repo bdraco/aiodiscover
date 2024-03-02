@@ -6,13 +6,16 @@ import random
 from contextlib import suppress
 from functools import lru_cache
 from ipaddress import IPv4Address
-from typing import Any, Optional, cast
+from typing import TYPE_CHECKING, Any, Optional, cast
 
 from dns import exception, message, rdatatype
 from dns.message import Message, QueryMessage
 from dns.name import Name
 
 from .network import SystemNetworkData
+
+if TYPE_CHECKING:
+    from pyroute2.iproute import IPRoute  # noqa: F401
 
 HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
@@ -183,24 +186,27 @@ class DiscoverHosts:
 
     def __init__(self) -> None:
         """Init the discovery hosts."""
-        self._ip_route = None
+        self._sys_network_data: SystemNetworkData | None = None
 
-    def _get_sys_network_data(self) -> SystemNetworkData:
-        if not self._ip_route:
-            with suppress(Exception):
-                from pyroute2.iproute import (
-                    IPRoute,
-                )  # type: ignore # pylint: disable=import-outside-toplevel
+    def _setup_sys_network_data(self) -> None:
+        ip_route: "IPRoute" | None = None
+        with suppress(Exception):
+            from pyroute2.iproute import (  # noqa: F811
+                IPRoute,
+            )  # type: ignore # pylint: disable=import-outside-toplevel
 
-                self._ip_route = IPRoute()
-        sys_network_data = SystemNetworkData(self._ip_route)
+            ip_route = IPRoute()
+        sys_network_data = SystemNetworkData(ip_route)
         sys_network_data.setup()
-        return sys_network_data
+        self._sys_network_data = sys_network_data
 
     async def async_discover(self) -> list[dict[str, str]]:
         """Discover hosts on the network by ARP and PTR lookup."""
-        loop = asyncio.get_running_loop()
-        sys_network_data = await loop.run_in_executor(None, self._get_sys_network_data)
+        if not self._sys_network_data:
+            await asyncio.get_running_loop().run_in_executor(
+                None, self._setup_sys_network_data
+            )
+        sys_network_data = self._sys_network_data
         network = sys_network_data.network
         assert network is not None
         if network.num_addresses > MAX_ADDRESSES:
