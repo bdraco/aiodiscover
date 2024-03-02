@@ -15,7 +15,7 @@ from dns.name import Name
 from .network import SystemNetworkData
 
 if TYPE_CHECKING:
-    from pyroute2.iproute import IPRoute
+    from pyroute2.iproute import IPRoute  # noqa: F401
 
 HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
@@ -189,7 +189,7 @@ class DiscoverHosts:
         self._sys_network_data: SystemNetworkData | None = None
 
     def _setup_sys_network_data(self) -> None:
-        ip_route: IPRoute | None = None
+        ip_route: "IPRoute" | None = None
         with suppress(Exception):
             from pyroute2.iproute import (
                 IPRoute,
