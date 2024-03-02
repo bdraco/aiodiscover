@@ -191,7 +191,7 @@ class DiscoverHosts:
     def _setup_sys_network_data(self) -> None:
         ip_route: "IPRoute" | None = None
         with suppress(Exception):
-            from pyroute2.iproute import (
+            from pyroute2.iproute import ( # noqa: F811
                 IPRoute,
             )  # type: ignore # pylint: disable=import-outside-toplevel
 
