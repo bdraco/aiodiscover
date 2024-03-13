@@ -25,6 +25,7 @@ DNS_PORT = 53
 
 _LOGGER = logging.getLogger(__name__)
 
+
 @lru_cache(maxsize=MAX_ADDRESSES)
 def decode_idna(name: str) -> str:
     """Decode an idna name."""
@@ -32,6 +33,7 @@ def decode_idna(name: str) -> str:
         return name.encode().decode("idna")
     except UnicodeError:
         return name
+
 
 def dns_message_short_hostname(dns_message: Any | None) -> str | None:
     """Get the short hostname from a dns message."""
@@ -49,10 +51,10 @@ async def async_query_for_ptrs(
     """Fetch PTR records for a list of ips."""
     resolver = DNSResolver(nameservers=[nameserver], timeout=DNS_RESPONSE_TIMEOUT)
     results: list[Any | None] = []
-    for ip in ips_to_lookup:
-        name = ip.reverse_pointer
+    futures = [resolver.query(ip.reverse_pointer, "PTR") for ip in ips_to_lookup]
+    for future in asyncio.as_completed(futures):
         try:
-            results.append(await resolver.query(name, "PTR"))
+            results.append(await future)
         except DNSError:
             results.append(None)
 
@@ -70,8 +72,9 @@ class DiscoverHosts:
     def _setup_sys_network_data(self) -> None:
         ip_route: "IPRoute" | None = None
         with suppress(Exception):
-            from pyroute2.iproute import \
-                IPRoute  # noqa: F811; type: ignore # pylint: disable=import-outside-toplevel
+            from pyroute2.iproute import (
+                IPRoute,
+            )  # noqa: F811; type: ignore # pylint: disable=import-outside-toplevel
 
             ip_route = IPRoute()
         sys_network_data = SystemNetworkData(ip_route)
