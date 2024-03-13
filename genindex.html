@@ -57,14 +57,9 @@
 <li class="toctree-l3"><a class="reference internal" href="aiodiscover.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aiodiscover.html#module-aiodiscover.discovery">aiodiscover.discovery module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.DiscoverHosts"><code class="docutils literal notranslate"><span class="pre">DiscoverHosts</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.FastName"><code class="docutils literal notranslate"><span class="pre">FastName</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.PTRResolver"><code class="docutils literal notranslate"><span class="pre">PTRResolver</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.async_mutate_ptr_query"><code class="docutils literal notranslate"><span class="pre">async_mutate_ptr_query()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.async_query_for_ptr_with_proto"><code class="docutils literal notranslate"><span class="pre">async_query_for_ptr_with_proto()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.async_query_for_ptrs"><code class="docutils literal notranslate"><span class="pre">async_query_for_ptrs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.decode_idna"><code class="docutils literal notranslate"><span class="pre">decode_idna()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.dns_message_short_hostname"><code class="docutils literal notranslate"><span class="pre">dns_message_short_hostname()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.set_exception_if_not_done"><code class="docutils literal notranslate"><span class="pre">set_exception_if_not_done()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="aiodiscover.html#aiodiscover.discovery.short_hostname"><code class="docutils literal notranslate"><span class="pre">short_hostname()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="aiodiscover.html#module-aiodiscover.network">aiodiscover.network module</a><ul>
@@ -122,16 +117,11 @@
 
 <div class="genindex-jumpbox">
  <a href="#A"><strong>A</strong></a>
- | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
- | <a href="#E"><strong>E</strong></a>
- | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
- | <a href="#P"><strong>P</strong></a>
  | <a href="#S"><strong>S</strong></a>
- | <a href="#T"><strong>T</strong></a>
  
 </div>
 <h2 id="A">A</h2>
@@ -158,6 +148,8 @@
         <li><a href="aiodiscover.html#module-aiodiscover.network">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     aiodiscover.util
 
@@ -165,33 +157,15 @@
         <li><a href="aiodiscover.html#module-aiodiscover.util">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="aiodiscover.html#aiodiscover.discovery.DiscoverHosts.async_discover">async_discover() (aiodiscover.discovery.DiscoverHosts method)</a>
 </li>
       <li><a href="aiodiscover.html#aiodiscover.discovery.DiscoverHosts.async_get_hostnames">async_get_hostnames() (aiodiscover.discovery.DiscoverHosts method)</a>
 </li>
       <li><a href="aiodiscover.html#aiodiscover.network.SystemNetworkData.async_get_neighbors">async_get_neighbors() (aiodiscover.network.SystemNetworkData method)</a>
 </li>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.async_mutate_ptr_query">async_mutate_ptr_query() (in module aiodiscover.discovery)</a>
-</li>
       <li><a href="aiodiscover.html#aiodiscover.network.async_populate_arp">async_populate_arp() (in module aiodiscover.network)</a>
 </li>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.async_query_for_ptr_with_proto">async_query_for_ptr_with_proto() (in module aiodiscover.discovery)</a>
-</li>
       <li><a href="aiodiscover.html#aiodiscover.discovery.async_query_for_ptrs">async_query_for_ptrs() (in module aiodiscover.discovery)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="C">C</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.PTRResolver.connection_lost">connection_lost() (aiodiscover.discovery.PTRResolver method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.PTRResolver.connection_made">connection_made() (aiodiscover.discovery.PTRResolver method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -199,29 +173,13 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.PTRResolver.datagram_received">datagram_received() (aiodiscover.discovery.PTRResolver method)</a>
+      <li><a href="aiodiscover.html#aiodiscover.discovery.decode_idna">decode_idna() (in module aiodiscover.discovery)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="aiodiscover.html#aiodiscover.discovery.DiscoverHosts">DiscoverHosts (class in aiodiscover.discovery)</a>
 </li>
       <li><a href="aiodiscover.html#aiodiscover.discovery.dns_message_short_hostname">dns_message_short_hostname() (in module aiodiscover.discovery)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="E">E</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.PTRResolver.error_received">error_received() (aiodiscover.discovery.PTRResolver method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.FastName">FastName (class in aiodiscover.discovery)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -273,36 +231,14 @@
   </ul></td>
 </tr></table>
 
-<h2 id="P">P</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.PTRResolver">PTRResolver (class in aiodiscover.discovery)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.PTRResolver.send_query">send_query() (aiodiscover.discovery.PTRResolver method)</a>
-</li>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.set_exception_if_not_done">set_exception_if_not_done() (in module aiodiscover.discovery)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="aiodiscover.html#aiodiscover.network.SystemNetworkData.setup">setup() (aiodiscover.network.SystemNetworkData method)</a>
 </li>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.short_hostname">short_hostname() (in module aiodiscover.discovery)</a>
-</li>
-      <li><a href="aiodiscover.html#aiodiscover.network.SystemNetworkData">SystemNetworkData (class in aiodiscover.network)</a>
-</li>
   </ul></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="aiodiscover.html#aiodiscover.discovery.FastName.to_wire">to_wire() (aiodiscover.discovery.FastName method)</a>
+      <li><a href="aiodiscover.html#aiodiscover.network.SystemNetworkData">SystemNetworkData (class in aiodiscover.network)</a>
 </li>
   </ul></td>
 </tr></table>
