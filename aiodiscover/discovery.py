@@ -52,10 +52,11 @@ async def async_query_for_ptrs(
     resolver = DNSResolver(nameservers=[nameserver], timeout=DNS_RESPONSE_TIMEOUT)
     results: list[Any | None] = []
     futures = [resolver.query(ip.reverse_pointer, "PTR") for ip in ips_to_lookup]
-    for future in asyncio.as_completed(futures):
-        try:
-            results.append(await future)
-        except DNSError:
+    await asyncio.wait(futures)
+    for future in futures:
+        if not future.exception():
+            results.append(future.result())
+        else:
             results.append(None)
 
     resolver.cancel()
