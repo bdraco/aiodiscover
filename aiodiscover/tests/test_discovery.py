@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 import asyncio
 from ipaddress import IPv4Address, IPv4Network, ip_address
-from unittest.mock import MagicMock, patch
-
+from unittest.mock import MagicMock, patch, AsyncMock
+from dataclasses import dataclass
 import pytest
 from dns import message, rdatatype
 from dns.message import Message
@@ -69,3 +69,40 @@ async def test_async_discover_hosts_with_dns_mock_neighbor_mock():
         {"hostname": "any", "ip": "4.5.5.6", "macaddress": "ff:bb:cc:0d:ee:ff"},
     ]
 
+
+@pytest.mark.asyncio
+async def test_async_query_for_ptrs():
+    """Test async_query_for_ptrs handles missing ips."""
+    loop = asyncio.get_running_loop()
+    count = 0
+
+    @dataclass
+    class MockReply:
+        name: str
+
+    def mock_query(*args, **kwargs):
+        nonlocal count
+        count += 1
+        future = loop.create_future()
+        if count == 2:
+            future.set_exception(Exception("test"))
+        else:
+            future.set_result(MockReply(name=f"name{count}"))
+        return future
+
+    with patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0), patch(
+        "aiodiscover.discovery.DNSResolver.query", mock_query
+    ):
+        response = await discovery.async_query_for_ptrs(
+            "192.168.107.1",
+            [
+                IPv4Address("192.168.107.2"),
+                IPv4Address("192.168.107.3"),
+                IPv4Address("192.168.107.4"),
+            ],
+        )
+
+    assert len(response) == 3
+    assert response[0].name == "name1"
+    assert response[1] is None
+    assert response[2].name == "name3"
