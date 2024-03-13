@@ -7,7 +7,6 @@ from ipaddress import IPv4Address
 from typing import TYPE_CHECKING, Any
 from functools import lru_cache
 from aiodns import DNSResolver
-from aiodns.error import DNSError
 
 from .network import SystemNetworkData
 
