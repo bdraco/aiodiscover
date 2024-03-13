@@ -5,8 +5,12 @@ from ipaddress import IPv4Address, IPv4Network
 from unittest.mock import patch
 from dataclasses import dataclass
 import pytest
+import sys
 
 from aiodiscover import discovery
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 @pytest.mark.asyncio
