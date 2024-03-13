@@ -50,15 +50,9 @@ async def async_query_for_ptrs(
 ) -> list[Any | None]:
     """Fetch PTR records for a list of ips."""
     resolver = DNSResolver(nameservers=[nameserver], timeout=DNS_RESPONSE_TIMEOUT)
-    results: list[Any | None] = []
     futures = [resolver.query(ip.reverse_pointer, "PTR") for ip in ips_to_lookup]
     await asyncio.wait(futures)
-    for future in futures:
-        if not future.exception():
-            results.append(future.result())
-        else:
-            results.append(None)
-
+    results = [None if future.exception() else future.result() for future in futures]
     resolver.cancel()
     return results
 
