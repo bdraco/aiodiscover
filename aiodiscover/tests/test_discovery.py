@@ -1,26 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import asyncio
-from ipaddress import IPv4Address, IPv4Network, ip_address
-from unittest.mock import MagicMock, patch, AsyncMock
+from ipaddress import IPv4Address, IPv4Network
+from unittest.mock import patch
 from dataclasses import dataclass
 import pytest
-from dns import message, rdatatype
-from dns.message import Message
 
 from aiodiscover import discovery
-
-UDP_PTR_RESOLUTION_OCTETS = (
-    b"\x8cV\x85\x80\x00\x01\x00\x01\x00\x00\x00\x00\x0249\x03107\x03168\x03192\x07"
-    b"in-addr\x04arpa\x00\x00\x0c\x00\x01\xc0\x0c\x00\x0c\x00\x01\x00\x00\x00\x00"
-    b"\x00(\x1bBroadlink_RMPROSUB-cc-ce-9f\x06koston\x03org\x00"
-)
-
-UDP_PTR_RESOLUTION_OCTETS_IDNA = (
-    b"E\xca\x85\x80\x00\x01\x00\x01\x00\x00\x00\x00\x03237\x03209\x03168\x03192"
-    b"\x07in-addr\x04arpa\x00\x00\x0c\x00\x01\xc0\x0c\x00\x0c\x00\x01"
-    b"\x00\x00\x00\x00\x00\x1c\x0fAlxGarageSwitch\x06koston\x03org\x00"
-)
 
 
 @pytest.mark.asyncio
