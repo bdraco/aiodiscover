@@ -96,3 +96,42 @@ async def test_async_query_for_ptrs():
     assert response[0].name == "name1"
     assert response[1] is None
     assert response[2].name == "name3"
+
+
+
+@pytest.mark.asyncio
+async def test_async_query_for_ptrs_chunked():
+    """Test async_query_for_ptrs chunkeds."""
+    loop = asyncio.get_running_loop()
+    count = 0
+
+    @dataclass
+    class MockReply:
+        name: str
+
+    def mock_query(*args, **kwargs):
+        nonlocal count
+        count += 1
+        future = loop.create_future()
+        if count == 2:
+            future.set_exception(Exception("test"))
+        else:
+            future.set_result(MockReply(name=f"name{count}"))
+        return future
+
+    with patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0), patch(
+        "aiodiscover.discovery.DNSResolver.query", mock_query
+    ), patch.object(discovery,"QUERY_BUCKET_SIZE", 1):
+        response = await discovery.async_query_for_ptrs(
+            "192.168.107.1",
+            [
+                IPv4Address("192.168.107.2"),
+                IPv4Address("192.168.107.3"),
+                IPv4Address("192.168.107.4"),
+            ],
+        )
+
+    assert len(response) == 3
+    assert response[0].name == "name1"
+    assert response[1] is None
+    assert response[2].name == "name3"

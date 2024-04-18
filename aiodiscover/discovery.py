@@ -4,8 +4,9 @@ import asyncio
 import logging
 from contextlib import suppress
 from ipaddress import IPv4Address
-from typing import TYPE_CHECKING, Any
-from functools import lru_cache
+from typing import TYPE_CHECKING, Any, Iterable, cast
+from itertools import islice
+from functools import lru_cache, partial
 from aiodns import DNSResolver
 
 from .network import SystemNetworkData
@@ -17,8 +18,11 @@ HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
 IP_ADDRESS = "ip"
 MAX_ADDRESSES = 2048
+QUERY_BUCKET_SIZE = 64
 
 DNS_RESPONSE_TIMEOUT = 2
+
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,12 +51,34 @@ async def async_query_for_ptrs(
 ) -> list[Any | None]:
     """Fetch PTR records for a list of ips."""
     resolver = DNSResolver(nameservers=[nameserver], timeout=DNS_RESPONSE_TIMEOUT)
-    futures = [resolver.query(ip.reverse_pointer, "PTR") for ip in ips_to_lookup]
-    await asyncio.wait(futures)
-    results = [None if future.exception() else future.result() for future in futures]
+    results: list[Any | None] = []
+    for ip_chunk in chunked(ips_to_lookup, QUERY_BUCKET_SIZE):
+        if TYPE_CHECKING:
+            ip_chunk = cast("list[IPv4Address]", ip_chunk)
+        futures = [resolver.query(ip.reverse_pointer, "PTR") for ip in ip_chunk]
+        await asyncio.wait(futures)
+        results.extend(
+            None if future.exception() else future.result() for future in futures
+        )
     resolver.cancel()
     return results
 
+
+
+def take(take_num: int, iterable: Iterable) -> list[Any]:
+    """Return first n items of the iterable as a list.
+
+    From itertools recipes
+    """
+    return list(islice(iterable, take_num))
+
+
+def chunked(iterable: Iterable, chunked_num: int) -> Iterable[Any]:
+    """Break *iterable* into lists of length *n*.
+
+    From more-itertools
+    """
+    return iter(partial(take, chunked_num, iter(iterable)), [])
 
 class DiscoverHosts:
     """Discover hosts on the network by ARP and PTR lookup."""
