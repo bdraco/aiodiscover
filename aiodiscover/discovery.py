@@ -3,10 +3,11 @@ from __future__ import annotations
 import asyncio
 import logging
 from contextlib import suppress
-from ipaddress import IPv4Address
-from typing import TYPE_CHECKING, Any, Iterable, cast
-from itertools import islice
 from functools import lru_cache, partial
+from ipaddress import IPv4Address
+from itertools import islice
+from typing import TYPE_CHECKING, Any, Iterable, cast
+
 from aiodns import DNSResolver
 
 from .network import SystemNetworkData
@@ -21,7 +22,6 @@ MAX_ADDRESSES = 2048
 QUERY_BUCKET_SIZE = 64
 
 DNS_RESPONSE_TIMEOUT = 2
-
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -64,7 +64,6 @@ async def async_query_for_ptrs(
     return results
 
 
-
 def take(take_num: int, iterable: Iterable) -> list[Any]:
     """Return first n items of the iterable as a list.
 
@@ -80,6 +79,7 @@ def chunked(iterable: Iterable, chunked_num: int) -> Iterable[Any]:
     """
     return iter(partial(take, chunked_num, iter(iterable)), [])
 
+
 class DiscoverHosts:
     """Discover hosts on the network by ARP and PTR lookup."""
 
@@ -90,9 +90,8 @@ class DiscoverHosts:
     def _setup_sys_network_data(self) -> None:
         ip_route: "IPRoute" | None = None
         with suppress(Exception):
-            from pyroute2.iproute import (  # noqa: F811
-                IPRoute,
-            )  # type: ignore # pylint: disable=import-outside-toplevel
+            from pyroute2.iproute import \
+                IPRoute  # noqa: F811; type: ignore # pylint: disable=import-outside-toplevel
 
             ip_route = IPRoute()
         sys_network_data = SystemNetworkData(ip_route)

@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import asyncio
+import sys
+from dataclasses import dataclass
 from ipaddress import IPv4Address, IPv4Network
 from unittest.mock import patch
-from dataclasses import dataclass
+
 import pytest
-import sys
 
 from aiodiscover import discovery
 
@@ -98,7 +99,6 @@ async def test_async_query_for_ptrs():
     assert response[2].name == "name3"
 
 
-
 @pytest.mark.asyncio
 async def test_async_query_for_ptrs_chunked():
     """Test async_query_for_ptrs chunkeds."""
@@ -121,7 +121,7 @@ async def test_async_query_for_ptrs_chunked():
 
     with patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0), patch(
         "aiodiscover.discovery.DNSResolver.query", mock_query
-    ), patch.object(discovery,"QUERY_BUCKET_SIZE", 1):
+    ), patch.object(discovery, "QUERY_BUCKET_SIZE", 1):
         response = await discovery.async_query_for_ptrs(
             "192.168.107.1",
             [
