@@ -4,7 +4,7 @@ import asyncio
 import logging
 from contextlib import suppress
 from functools import lru_cache, partial
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, ip_address
 from itertools import islice
 from typing import TYPE_CHECKING, Any, Iterable, cast
 
@@ -133,11 +133,19 @@ class DiscoverHosts:
         """Get nameservers to query."""
         all_nameservers = list(sys_network_data.nameservers)
         router_ip = sys_network_data.router_ip
-        assert router_ip is not None
-        if router_ip not in all_nameservers:
-            neighbours = await sys_network_data.async_get_neighbors([router_ip])
-            if router_ip in neighbours:
-                all_nameservers.insert(0, router_ip)
+        # if none of the nameservers are in the same network as the router
+        # insert it to the list of nameservers
+        add_router = True
+        for nameserver in all_nameservers:
+            if ip_address(router_ip) in sys_network_data.network:
+                add_router = False
+                break
+        if add_router:
+            assert router_ip is not None
+            if router_ip not in all_nameservers:
+                neighbours = await sys_network_data.async_get_neighbors([router_ip])
+                if router_ip in neighbours:
+                    all_nameservers.insert(0, router_ip)
         return all_nameservers
 
     async def async_get_hostnames(
