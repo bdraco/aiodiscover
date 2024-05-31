@@ -137,7 +137,7 @@ class DiscoverHosts:
         if router_ip not in all_nameservers:
             neighbours = await sys_network_data.async_get_neighbors([router_ip])
             if router_ip in neighbours:
-                all_nameservers.insert(0, router_ip)
+                all_nameservers.append(router_ip)
         return all_nameservers
 
     async def async_get_hostnames(
