@@ -134,10 +134,14 @@ class DiscoverHosts:
         all_nameservers = list(sys_network_data.nameservers)
         router_ip = sys_network_data.router_ip
         assert router_ip is not None
-        if router_ip not in all_nameservers:
+        router_subnet = ipaddress.ip_network(f"{router_ip}/24", strict=False)
+        nameservers_in_same_subnet = [
+            ns for ns in all_nameservers if ipaddress.ip_address(ns) in router_subnet
+        ]
+        if not nameservers_in_same_subnet:
             neighbours = await sys_network_data.async_get_neighbors([router_ip])
             if router_ip in neighbours:
-                all_nameservers.insert(0, router_ip)
+                all_nameservers.append(router_ip)
         return all_nameservers
 
     async def async_get_hostnames(
