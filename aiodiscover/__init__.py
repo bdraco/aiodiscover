@@ -9,5 +9,5 @@ __version__ = "2.1.0"
 from .discovery import DiscoverHosts  # noqa: F401
 
 
-def get_module_version():
+def get_module_version() -> str:
     return __version__
