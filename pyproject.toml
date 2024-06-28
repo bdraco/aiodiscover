@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiodiscover"
-version = "2.1.0"
+version = "2.2.0"
 description = "Discover hosts by arp and ptr lookup"
 authors = ["J. Nick Koston <nick@koston.org>"]
 readme = "README.md"
@@ -25,9 +25,6 @@ packages = [
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/bdraco/aiodiscover/issues"
 "Changelog" = "https://github.com/bdraco/aiodiscover/blob/main/CHANGELOG.md"
-
-[tool.poetry.scripts]
-aiodiscover = "aiodiscover.cli:app"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
