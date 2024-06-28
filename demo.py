@@ -1,5 +1,6 @@
 import asyncio
 import pprint
+
 from aiodiscover import DiscoverHosts
 
 discover_hosts = DiscoverHosts()
