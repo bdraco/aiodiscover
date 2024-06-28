@@ -4,9 +4,10 @@ import asyncio
 import re
 import socket
 import sys
+from collections.abc import Iterable
 from contextlib import suppress
 from ipaddress import IPv4Network, ip_network
-from typing import TYPE_CHECKING, Any, Iterable
+from typing import TYPE_CHECKING, Any
 
 import ifaddr  # type: ignore
 from cached_ipaddress import cached_ip_addresses
@@ -76,11 +77,14 @@ def get_network(local_ip: str, adapters: Any) -> IPv4Network:
     network_prefix = (
         get_ip_prefix_from_adapters(local_ip, adapters) or DEFAULT_NETWORK_PREFIX
     )
-    return ip_network(f"{local_ip}/{network_prefix}", False)
+    network = ip_network(f"{local_ip}/{network_prefix}", False)
+    if TYPE_CHECKING:
+        assert isinstance(network, IPv4Network)
+    return network
 
 
 def get_ip_prefix_from_adapters(local_ip: str, adapters: Any) -> int | None:
-    """Find the nework prefix for an adapter."""
+    """Find the network prefix for an adapter."""
     for adapter in adapters:
         for ip in adapter.ips:
             if local_ip == ip.ip:
@@ -95,7 +99,7 @@ def get_attrs_key(data: Any, key: Any) -> Any:
             return attr_value
 
 
-def get_router_ip(ipr: "IPRoute") -> Any:
+def get_router_ip(ipr: IPRoute) -> Any:
     """Obtain the router ip from the default route."""
     return get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
 
@@ -119,7 +123,7 @@ def _fill_neighbor(neighbours: dict[str, str], ip: str, mac: str) -> None:
     neighbours[ip] = mac
 
 
-def async_populate_arp(ip_addresses):
+def async_populate_arp(ip_addresses: Iterable[str]) -> socket.socket:
     """Send an empty packet to a host to populate the arp cache."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
     sock.setblocking(False)
@@ -134,7 +138,7 @@ def async_populate_arp(ip_addresses):
 class SystemNetworkData:
     """Gather system network data."""
 
-    def __init__(self, ip_route: "IPRoute" | None, local_ip: str | None = None) -> None:
+    def __init__(self, ip_route: IPRoute | None, local_ip: str | None = None) -> None:
         """Init system network data."""
         self.ip_route = ip_route
         self.local_ip = local_ip
@@ -235,13 +239,15 @@ class SystemNetworkData:
 
         return neighbours
 
-    async def _async_get_neighbors_ip_route(self):
+    async def _async_get_neighbors_ip_route(self) -> dict[str, str]:
         """Get neighbors with pyroute2."""
-        neighbours = {}
+        neighbours: dict[str, str] = {}
         loop = asyncio.get_running_loop()
         # This shouldn't ever block but it does
         # interact with netlink so its safer to run
         # in the executor
+        if TYPE_CHECKING:
+            assert self.ip_route is not None
         for neighbour in await loop.run_in_executor(None, self.ip_route.get_neighbours):
             ip = None
             mac = None
