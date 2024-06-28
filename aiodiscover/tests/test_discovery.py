@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import asyncio
 import sys
 from dataclasses import dataclass
@@ -27,8 +26,11 @@ async def test_async_discover_hosts():
 async def test_async_discover_hosts_with_dns_mock():
     """Verify discover hosts does not throw."""
     discover_hosts = discovery.DiscoverHosts()
-    with patch.object(discovery, "MAX_ADDRESSES", 2), patch(
-        "aiodiscover.discovery.dns_message_short_hostname", return_value="router"
+    with (
+        patch.object(discovery, "MAX_ADDRESSES", 2),
+        patch(
+            "aiodiscover.discovery.dns_message_short_hostname", return_value="router"
+        ),
     ):
         hosts = await discover_hosts.async_discover()
     assert isinstance(hosts, list)
@@ -43,15 +45,18 @@ async def test_async_discover_hosts_with_dns_mock_neighbor_mock():
         return {"1.2.3.4": "router", "4.5.5.6": "any"}
 
     discover_hosts.async_get_hostnames = _async_get_hostnames
-    with patch(
-        "aiodiscover.network.SystemNetworkData.async_get_neighbors",
-        return_value={
-            "1.2.3.4": "aa:bb:cc:dd:ee:ff",
-            "4.5.5.6": "ff:bb:cc:0d:ee:ff",
-        },
-    ), patch(
-        "aiodiscover.network.get_network",
-        return_value=IPv4Network("1.2.3.0/24", False),
+    with (
+        patch(
+            "aiodiscover.network.SystemNetworkData.async_get_neighbors",
+            return_value={
+                "1.2.3.4": "aa:bb:cc:dd:ee:ff",
+                "4.5.5.6": "ff:bb:cc:0d:ee:ff",
+            },
+        ),
+        patch(
+            "aiodiscover.network.get_network",
+            return_value=IPv4Network("1.2.3.0/24", False),
+        ),
     ):
         hosts = await discover_hosts.async_discover()
 
@@ -81,8 +86,9 @@ async def test_async_query_for_ptrs():
             future.set_result(MockReply(name=f"name{count}"))
         return future
 
-    with patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0), patch(
-        "aiodiscover.discovery.DNSResolver.query", mock_query
+    with (
+        patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0),
+        patch("aiodiscover.discovery.DNSResolver.query", mock_query),
     ):
         response = await discovery.async_query_for_ptrs(
             "192.168.107.1",
@@ -119,9 +125,11 @@ async def test_async_query_for_ptrs_chunked():
             future.set_result(MockReply(name=f"name{count}"))
         return future
 
-    with patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0), patch(
-        "aiodiscover.discovery.DNSResolver.query", mock_query
-    ), patch.object(discovery, "QUERY_BUCKET_SIZE", 1):
+    with (
+        patch.object(discovery, "DNS_RESPONSE_TIMEOUT", 0),
+        patch("aiodiscover.discovery.DNSResolver.query", mock_query),
+        patch.object(discovery, "QUERY_BUCKET_SIZE", 1),
+    ):
         response = await discovery.async_query_for_ptrs(
             "192.168.107.1",
             [

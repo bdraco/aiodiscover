@@ -1,23 +1,19 @@
 ---
 name: Feature Request
 about: '"It would be really cool if x did y..."'
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 ## Use Case
-*Please provide a use case to help us understand your request in context*
 
-
-
+_Please provide a use case to help us understand your request in context_
 
 ## Solution
-*Please describe your ideal solution*
 
-
-
+_Please describe your ideal solution_
 
 ## Alternatives
-*Please describe any alternatives you've considered, even if you've dismissed them*
+
+_Please describe any alternatives you've considered, even if you've dismissed them_

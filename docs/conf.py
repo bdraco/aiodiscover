@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # aiodiscover documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  9 13:47:02 2017.
@@ -20,8 +19,6 @@
 #
 import os
 import sys
-
-import sphinx_rtd_theme
 
 import aiodiscover
 
@@ -60,18 +57,18 @@ templates_path = ["_templates"]
 # You can specify multiple suffix as a list of string:
 #
 source_suffix = {
-        ".rst": "restructuredtext",
-        ".txt": "markdown",
-        ".md": "markdown",
+    ".rst": "restructuredtext",
+    ".txt": "markdown",
+    ".md": "markdown",
 }
 
 # The master toctree document.
 master_doc = "index"
 
 # General information about the project.
-project = u"Async Host discovery"
-copyright = u'2021, J. Nick Koston'
-author = u"J. Nick Koston"
+project = "Async Host discovery"
+copyright = "2021, J. Nick Koston"
+author = "J. Nick Koston"
 
 # The version info for the project you"re documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -135,15 +132,12 @@ latex_elements = {
     # The paper size ("letterpaper" or "a4paper").
     #
     # "papersize": "letterpaper",
-
     # The font size ("10pt", "11pt" or "12pt").
     #
     # "pointsize": "10pt",
-
     # Additional stuff for the LaTeX preamble.
     #
     # "preamble": "",
-
     # Latex figure (float) alignment
     #
     # "figure_align": "htbp",
@@ -153,9 +147,13 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "aiodiscover.tex",
-     u"Async Host discovery Documentation",
-     u"J. Nick Koston", "manual"),
+    (
+        master_doc,
+        "aiodiscover.tex",
+        "Async Host discovery Documentation",
+        "J. Nick Koston",
+        "manual",
+    ),
 ]
 
 
@@ -164,9 +162,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, "aiodiscover",
-     u"Async Host discovery Documentation",
-     [author], 1)
+    (master_doc, "aiodiscover", "Async Host discovery Documentation", [author], 1)
 ]
 
 
@@ -176,10 +172,13 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, "aiodiscover",
-     u"Async Host discovery Documentation",
-     author,
-     "aiodiscover",
-     "One line description of project.",
-     "Miscellaneous"),
+    (
+        master_doc,
+        "aiodiscover",
+        "Async Host discovery Documentation",
+        author,
+        "aiodiscover",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
 ]

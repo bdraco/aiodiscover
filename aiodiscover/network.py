@@ -4,9 +4,10 @@ import asyncio
 import re
 import socket
 import sys
+from collections.abc import Iterable
 from contextlib import suppress
 from ipaddress import IPv4Network, ip_network
-from typing import TYPE_CHECKING, Any, Iterable
+from typing import TYPE_CHECKING, Any
 
 import ifaddr  # type: ignore
 from cached_ipaddress import cached_ip_addresses
@@ -80,7 +81,7 @@ def get_network(local_ip: str, adapters: Any) -> IPv4Network:
 
 
 def get_ip_prefix_from_adapters(local_ip: str, adapters: Any) -> int | None:
-    """Find the nework prefix for an adapter."""
+    """Find the network prefix for an adapter."""
     for adapter in adapters:
         for ip in adapter.ips:
             if local_ip == ip.ip:
@@ -95,7 +96,7 @@ def get_attrs_key(data: Any, key: Any) -> Any:
             return attr_value
 
 
-def get_router_ip(ipr: "IPRoute") -> Any:
+def get_router_ip(ipr: IPRoute) -> Any:
     """Obtain the router ip from the default route."""
     return get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
 
@@ -134,7 +135,7 @@ def async_populate_arp(ip_addresses):
 class SystemNetworkData:
     """Gather system network data."""
 
-    def __init__(self, ip_route: "IPRoute" | None, local_ip: str | None = None) -> None:
+    def __init__(self, ip_route: IPRoute | None, local_ip: str | None = None) -> None:
         """Init system network data."""
         self.ip_route = ip_route
         self.local_ip = local_ip
