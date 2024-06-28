@@ -3,6 +3,7 @@ import asyncio
 import sys
 from dataclasses import dataclass
 from ipaddress import IPv4Address, IPv4Network
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -14,7 +15,7 @@ if sys.platform == "win32":
 
 
 @pytest.mark.asyncio
-async def test_async_discover_hosts():
+async def test_async_discover_hosts() -> None:
     """Verify discover hosts does not throw."""
     discover_hosts = discovery.DiscoverHosts()
     with patch.object(discovery, "MAX_ADDRESSES", 16):
@@ -23,7 +24,7 @@ async def test_async_discover_hosts():
 
 
 @pytest.mark.asyncio
-async def test_async_discover_hosts_with_dns_mock():
+async def test_async_discover_hosts_with_dns_mock() -> None:
     """Verify discover hosts does not throw."""
     discover_hosts = discovery.DiscoverHosts()
     with (
@@ -37,14 +38,14 @@ async def test_async_discover_hosts_with_dns_mock():
 
 
 @pytest.mark.asyncio
-async def test_async_discover_hosts_with_dns_mock_neighbor_mock():
+async def test_async_discover_hosts_with_dns_mock_neighbor_mock() -> None:
     """Verify discover hosts does not throw."""
     discover_hosts = discovery.DiscoverHosts()
 
-    async def _async_get_hostnames(sys_network_data):
+    async def _async_get_hostnames(sys_network_data: Any) -> dict[str, str]:
         return {"1.2.3.4": "router", "4.5.5.6": "any"}
 
-    discover_hosts.async_get_hostnames = _async_get_hostnames
+    discover_hosts.async_get_hostnames = _async_get_hostnames  # type: ignore
     with (
         patch(
             "aiodiscover.network.SystemNetworkData.async_get_neighbors",
@@ -67,7 +68,7 @@ async def test_async_discover_hosts_with_dns_mock_neighbor_mock():
 
 
 @pytest.mark.asyncio
-async def test_async_query_for_ptrs():
+async def test_async_query_for_ptrs() -> None:
     """Test async_query_for_ptrs handles missing ips."""
     loop = asyncio.get_running_loop()
     count = 0
@@ -76,7 +77,7 @@ async def test_async_query_for_ptrs():
     class MockReply:
         name: str
 
-    def mock_query(*args, **kwargs):
+    def mock_query(*args: Any, **kwargs: Any) -> Any:
         nonlocal count
         count += 1
         future = loop.create_future()
@@ -100,13 +101,13 @@ async def test_async_query_for_ptrs():
         )
 
     assert len(response) == 3
-    assert response[0].name == "name1"
-    assert response[1] is None
-    assert response[2].name == "name3"
+    assert response[0].name == "name1"  # type: ignore
+    assert response[1] is None  # type: ignore
+    assert response[2].name == "name3"  # type: ignore
 
 
 @pytest.mark.asyncio
-async def test_async_query_for_ptrs_chunked():
+async def test_async_query_for_ptrs_chunked() -> None:
     """Test async_query_for_ptrs chunkeds."""
     loop = asyncio.get_running_loop()
     count = 0
@@ -115,7 +116,7 @@ async def test_async_query_for_ptrs_chunked():
     class MockReply:
         name: str
 
-    def mock_query(*args, **kwargs):
+    def mock_query(*args: Any, **kwargs: Any) -> Any:
         nonlocal count
         count += 1
         future = loop.create_future()
@@ -140,6 +141,6 @@ async def test_async_query_for_ptrs_chunked():
         )
 
     assert len(response) == 3
-    assert response[0].name == "name1"
+    assert response[0].name == "name1"  # type: ignore
     assert response[1] is None
-    assert response[2].name == "name3"
+    assert response[2].name == "name3"  # type: ignore

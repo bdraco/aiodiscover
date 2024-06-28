@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import annotations
+
 #
 # aiodiscover documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  9 13:47:02 2017.
@@ -11,7 +13,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-
 # If extensions (or modules to document with autodoc) are in another
 # directory, add these directories to sys.path here. If the directory is
 # relative to the documentation root, use os.path.abspath to make it
@@ -19,6 +20,7 @@
 #
 import os
 import sys
+from typing import Any
 
 import aiodiscover
 
@@ -128,7 +130,7 @@ htmlhelp_basename = "aiodiscoverdoc"
 
 # -- Options for LaTeX output ------------------------------------------
 
-latex_elements = {
+latex_elements: dict[str, Any] = {
     # The paper size ("letterpaper" or "a4paper").
     #
     # "papersize": "letterpaper",

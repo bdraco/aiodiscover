@@ -65,7 +65,7 @@ async def async_query_for_ptrs(
     return results
 
 
-def take(take_num: int, iterable: Iterable) -> list[Any]:
+def take(take_num: int, iterable: Iterable[Any]) -> list[Any]:
     """
     Return first n items of the iterable as a list.
 
@@ -74,7 +74,7 @@ def take(take_num: int, iterable: Iterable) -> list[Any]:
     return list(islice(iterable, take_num))
 
 
-def chunked(iterable: Iterable, chunked_num: int) -> Iterable[Any]:
+def chunked(iterable: Iterable[Any], chunked_num: int) -> Iterable[Any]:
     """
     Break *iterable* into lists of length *n*.
 
@@ -108,9 +108,12 @@ class DiscoverHosts:
             await asyncio.get_running_loop().run_in_executor(
                 None, self._setup_sys_network_data
             )
+        if TYPE_CHECKING:
+            assert self._sys_network_data is not None
         sys_network_data = self._sys_network_data
         network = sys_network_data.network
-        assert network is not None
+        if TYPE_CHECKING:
+            assert network is not None
         if network.num_addresses > MAX_ADDRESSES:
             _LOGGER.debug(
                 "The network %s exceeds the maximum number of addresses, %s; No scanning performed",
