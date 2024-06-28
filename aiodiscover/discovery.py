@@ -2,18 +2,19 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Iterable
 from contextlib import suppress
 from functools import lru_cache, partial
 from ipaddress import IPv4Address, ip_address
 from itertools import islice
-from typing import TYPE_CHECKING, Any, Iterable, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from aiodns import DNSResolver
 
 from .network import SystemNetworkData
 
 if TYPE_CHECKING:
-    from pyroute2.iproute import IPRoute  # noqa: F401
+    from pyroute2.iproute import IPRoute
 
 HOSTNAME = "hostname"
 MAC_ADDRESS = "macaddress"
@@ -64,16 +65,18 @@ async def async_query_for_ptrs(
     return results
 
 
-def take(take_num: int, iterable: Iterable) -> list[Any]:
-    """Return first n items of the iterable as a list.
+def take(take_num: int, iterable: Iterable[Any]) -> list[Any]:
+    """
+    Return first n items of the iterable as a list.
 
     From itertools recipes
     """
     return list(islice(iterable, take_num))
 
 
-def chunked(iterable: Iterable, chunked_num: int) -> Iterable[Any]:
-    """Break *iterable* into lists of length *n*.
+def chunked(iterable: Iterable[Any], chunked_num: int) -> Iterable[Any]:
+    """
+    Break *iterable* into lists of length *n*.
 
     From more-itertools
     """
@@ -88,11 +91,11 @@ class DiscoverHosts:
         self._sys_network_data: SystemNetworkData | None = None
 
     def _setup_sys_network_data(self) -> None:
-        ip_route: "IPRoute" | None = None
+        ip_route: IPRoute | None = None
         with suppress(Exception):
-            from pyroute2.iproute import (  # noqa: F811
+            from pyroute2.iproute import (
                 IPRoute,
-            )  # type: ignore # pylint: disable=import-outside-toplevel
+            )
 
             ip_route = IPRoute()
         sys_network_data = SystemNetworkData(ip_route)
@@ -105,9 +108,12 @@ class DiscoverHosts:
             await asyncio.get_running_loop().run_in_executor(
                 None, self._setup_sys_network_data
             )
+        if TYPE_CHECKING:
+            assert self._sys_network_data is not None
         sys_network_data = self._sys_network_data
         network = sys_network_data.network
-        assert network is not None
+        if TYPE_CHECKING:
+            assert network is not None
         if network.num_addresses > MAX_ADDRESSES:
             _LOGGER.debug(
                 "The network %s exceeds the maximum number of addresses, %s; No scanning performed",
