@@ -93,13 +93,13 @@ lxml = ["lxml"]
 
 [[package]]
 name = "cached-ipaddress"
-version = "0.3.0"
+version = "0.5.0"
 description = "Cache construction of ipaddress objects"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = "<4.0,>=3.8"
 files = [
-    {file = "cached_ipaddress-0.3.0-cp310-cp310-manylinux_2_31_x86_64.whl", hash = "sha256:6abc69069ec4983cd8590ad416edb729188d3fb0d3672f75b414de3e9784645b"},
-    {file = "cached_ipaddress-0.3.0.tar.gz", hash = "sha256:5340b609c701a122394a937abef67f130d025f63b25f2523b929944c069c8063"},
+    {file = "cached_ipaddress-0.5.0-cp310-cp310-manylinux_2_31_x86_64.whl", hash = "sha256:f3aac8404d8f6cac5acd9bc6c891d98d906754ca4fbf46ec9190f468d68ebd75"},
+    {file = "cached_ipaddress-0.5.0.tar.gz", hash = "sha256:dc7a6d0818627109b2dc46c84b54f66989d446f0f52e65e55bf93919aacefc60"},
 ]
 
 [[package]]
