@@ -93,14 +93,17 @@ lxml = ["lxml"]
 
 [[package]]
 name = "cached-ipaddress"
-version = "0.6.0"
+version = "0.8.0"
 description = "Cache construction of ipaddress objects"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "cached_ipaddress-0.6.0-cp310-cp310-manylinux_2_31_x86_64.whl", hash = "sha256:2ec4a82b15b9089d4484519a90e4ddb8a4532c7ce41f9ac1fbd565830c94f70c"},
-    {file = "cached_ipaddress-0.6.0.tar.gz", hash = "sha256:9c88884ac73729fc720aca7a7a1c6ba3a4f06b357a6b50c18abfbee94b84c1f3"},
+    {file = "cached_ipaddress-0.8.0-cp310-cp310-manylinux_2_31_x86_64.whl", hash = "sha256:186bb29ad7be66ac05d327f00feec7885ca22b9a963e6c2dcc36882c315462d6"},
+    {file = "cached_ipaddress-0.8.0.tar.gz", hash = "sha256:65037b86959f20fd6505b8ecdbd9cb79c79fb0abc8d3a65c59125aa8d68e9c9b"},
 ]
+
+[package.dependencies]
+propcache = ">=0.0.0"
 
 [[package]]
 name = "certifi"
@@ -753,6 +756,113 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
+
+[[package]]
+name = "propcache"
+version = "0.1.0"
+description = "Accelerated property cache"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "propcache-0.1.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:eef5a3407ef17b1ceaf53ee685e299f27a01d046c2aeff907a1966bf78bfd247"},
+    {file = "propcache-0.1.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4dc91c9b3cdd966c1dd868787576a28d34479760396fad0ed80a0b673603244"},
+    {file = "propcache-0.1.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d1c82ca69e07a7bb7c87020c1a332da1566be1413708f4d996c39383309395ad"},
+    {file = "propcache-0.1.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2fd8ca1748bdcb4ce8122363a62e2edffb7d46f9a3c4fb0c42b31259d4cdf273"},
+    {file = "propcache-0.1.0-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:befefb939025a5c196c4f03923072b386c200e51c82c209104698b6279651b7c"},
+    {file = "propcache-0.1.0-cp310-cp310-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:4a4a35b1417fd934722ea189afeaf812403c60b6b43fcf01ff1ecd8243af19ea"},
+    {file = "propcache-0.1.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8e93f6d571cd344f8d62e7f2b2fdc59702b14aefd29014b38f3f15aaad0f5bd9"},
+    {file = "propcache-0.1.0-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ffcaeb86144cec4a5307ad567170aaf7856c7d2c82654725c1f265ed9c5eb636"},
+    {file = "propcache-0.1.0-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:d2486c8c5ee83038fc9b7570ead06704d6940ace192e92fde5e2208759c615b3"},
+    {file = "propcache-0.1.0-cp310-cp310-musllinux_1_2_armv7l.whl", hash = "sha256:13560d622612c20eeb78d06f6fd812ea41ebcb50c46f7193b02ef5553178b210"},
+    {file = "propcache-0.1.0-cp310-cp310-musllinux_1_2_i686.whl", hash = "sha256:9adb0b2890fc8e501ec4c90644d4a9f54667a609344d8271e17bf2f35cde9a39"},
+    {file = "propcache-0.1.0-cp310-cp310-musllinux_1_2_ppc64le.whl", hash = "sha256:54afebd38fe2321a31d18cfb17b22273e3cf1d588508fbd49ebf9696f7bfb353"},
+    {file = "propcache-0.1.0-cp310-cp310-musllinux_1_2_s390x.whl", hash = "sha256:3e7754f312d80de1d3bce218b939ef5a7604cb6711ccd230c6af6290b2a5cc01"},
+    {file = "propcache-0.1.0-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:5a92acae362d5fc8283173f756b3d8742d9f48d3fbd0f90fd42510db2f3849de"},
+    {file = "propcache-0.1.0-cp310-cp310-win32.whl", hash = "sha256:9effb7992e69ae69e7035db774a4296bf451e826f691a4aabb36e3b437ed34bc"},
+    {file = "propcache-0.1.0-cp310-cp310-win_amd64.whl", hash = "sha256:a729d06f8d99939106c17914025357bf595a5ab2a9922113ead34a939b574713"},
+    {file = "propcache-0.1.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:251f1becd84b53ce70ce338cf1466984f6468f2bc10211f64f1acb12c912e864"},
+    {file = "propcache-0.1.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:74e82ead7ae19a024922a428f73def75157f6454b18487a7dd922923cd9eaff9"},
+    {file = "propcache-0.1.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:16ecc73213da4d1808770fdec749a8df4e01487ab6836d482dea9bb3e94a85b9"},
+    {file = "propcache-0.1.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:241758bb8fd74fc622fe89faf7836ecd50fd537be06e4d1d1aea72c9767f57d7"},
+    {file = "propcache-0.1.0-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:bf3e1cd7b7040db6a87a21df45a3ff22c22e419666aa8979cf4981430f9ddf67"},
+    {file = "propcache-0.1.0-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:c19922d3e48976112a626a46ee4edd0ae617f68314f82a9701eafefb38961265"},
+    {file = "propcache-0.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ef7ed4264009b396b1b3bf833acb530217b3cbb52fc3a56e13be55766fbd6ffc"},
+    {file = "propcache-0.1.0-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ede7a29bb093fd5e53d917673a16fc93f1ac8a80368975c2f25b51260d7d0062"},
+    {file = "propcache-0.1.0-cp311-cp311-musllinux_1_2_aarch64.whl", hash = "sha256:d0c9cff53c23ff292aeb494783604678bb334913569db69ccd810b3458ca9b5a"},
+    {file = "propcache-0.1.0-cp311-cp311-musllinux_1_2_armv7l.whl", hash = "sha256:c9e3e5ffd1a7ffb83871d24bac18be5aaaa81cb0868cdf227c831eaa7338f860"},
+    {file = "propcache-0.1.0-cp311-cp311-musllinux_1_2_i686.whl", hash = "sha256:dea7dc14717f220782a3b2e66d9bfa5d3862b7e6f833d10e43de2eba549c9c16"},
+    {file = "propcache-0.1.0-cp311-cp311-musllinux_1_2_ppc64le.whl", hash = "sha256:53ad0cc02c317523f297749d31d02db0e8bd7c656171fd94ba65edadccb9ed17"},
+    {file = "propcache-0.1.0-cp311-cp311-musllinux_1_2_s390x.whl", hash = "sha256:e29e8318cf37bdea63d0574148e0427a8864b1e87955b5506525197ca7e28245"},
+    {file = "propcache-0.1.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:3ecb9e2c1135fb5c0d7d4fec6eadf41478ea0ef3138db84976c310851b8935cb"},
+    {file = "propcache-0.1.0-cp311-cp311-win32.whl", hash = "sha256:786fea3a3b93ebcdb5118a4649a0cb065032b217b57dd2e9b0885ef85d6d7f64"},
+    {file = "propcache-0.1.0-cp311-cp311-win_amd64.whl", hash = "sha256:7a00bfc708dc8d558d0561fc967f87939e8226a93be9b617d2fd712a425ff7f4"},
+    {file = "propcache-0.1.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:15481b740784f3ecac04095510cebcbf950e55121c73e2be6a7e0f5ad93e0cd1"},
+    {file = "propcache-0.1.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:d4568dc1ba11e2712f9b6d2af467921b93b1ea0195c4723a01f463c2baa76f3e"},
+    {file = "propcache-0.1.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:1abd249d2a77a873bf3532c6acffefe1aa907385f384355b959c6076a3f46588"},
+    {file = "propcache-0.1.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4bed95b39c80978e9d0e052b660c864dd38213fe4e6f5c1ddc1fc4c3db0732a0"},
+    {file = "propcache-0.1.0-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:bed0f968bac648fea41b36f1776301614fcd02922be8f86e9c7cea7cc3f144f4"},
+    {file = "propcache-0.1.0-cp312-cp312-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:76fc92eda9c2941c5aaa4ca65e1ddd913386023ddf5dc90c261519b5aa4f12bd"},
+    {file = "propcache-0.1.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:11ba2c4a51ec642ffe864edb2ac5d6c60fa71646bd33140d62ba079b079063bc"},
+    {file = "propcache-0.1.0-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:0e62f00431102bf8ddc2ca37b9874d434782ee71399146c1f95967806781a6b2"},
+    {file = "propcache-0.1.0-cp312-cp312-musllinux_1_2_aarch64.whl", hash = "sha256:7d64c154cd198209b43b449ed13bf72f0cf5a28a1ad4122a032a2fd877cf9868"},
+    {file = "propcache-0.1.0-cp312-cp312-musllinux_1_2_armv7l.whl", hash = "sha256:93b20ab7da4ca3b7da63ea00c44733bbc41f31301f10c776f232ac8e8e16a5ff"},
+    {file = "propcache-0.1.0-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:8049c9c9b55e59c95cefe867b986781f14ac192ffda8de67542b1ee88e6495b5"},
+    {file = "propcache-0.1.0-cp312-cp312-musllinux_1_2_ppc64le.whl", hash = "sha256:0ee873fed60bfd92bd5d8c5f16b73810830c80178851cf944d376f5507bc44d5"},
+    {file = "propcache-0.1.0-cp312-cp312-musllinux_1_2_s390x.whl", hash = "sha256:a2c5315f1903350e0a40ceb698e127db0ad9f1909f4d948d02fe183288d0953a"},
+    {file = "propcache-0.1.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:ff55f3bafc08c752bb107531123a3b5336180445d71f0cd7c0deca79199cd2f7"},
+    {file = "propcache-0.1.0-cp312-cp312-win32.whl", hash = "sha256:63c424d57f3ca9a55124fc8549bf2790fb6253b54809ce4f40922e7a90ab59b6"},
+    {file = "propcache-0.1.0-cp312-cp312-win_amd64.whl", hash = "sha256:fb666c669114f54cfdfe27ae67d560cab86873fa82b5494b5c540ea71dd469ba"},
+    {file = "propcache-0.1.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:07581e7b910aeeaf93cca47b9216917143dbe15e700699cff7f3085e247ab216"},
+    {file = "propcache-0.1.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:c6b24a589d7030125f391ccb1f33991e09a74b7bd78b564ebe3d1329c63becdb"},
+    {file = "propcache-0.1.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:4581aa24e6b25c1f6a98f399a6ec7adc2bc2870d9bdf60bc97b1779875b433e0"},
+    {file = "propcache-0.1.0-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:27c6cfb3472bda72b08078557fee5fc5aa9d9b9505b0b49545c796641a3b0454"},
+    {file = "propcache-0.1.0-cp313-cp313-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:45a1b044e6260db4fbc0f1064e7624e56d8588d717bdbc7cab30f6c341a9fdc9"},
+    {file = "propcache-0.1.0-cp313-cp313-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:261eef7655bac493d345adda07668f96fdd938ff807eb38f43fcdf2292d5dfb8"},
+    {file = "propcache-0.1.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:eefd9ddef6e90c124a5f9b711b01f1ad291be182a08bf3e829c1f26bc5303196"},
+    {file = "propcache-0.1.0-cp313-cp313-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:611af2fc07d098b50dc1c951fc36379508bbd56921c54dc12fe681eab5b78ed0"},
+    {file = "propcache-0.1.0-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:c4470058e6014194744372bf998bbb61f08c6b40c9adea6572531cca9af96f62"},
+    {file = "propcache-0.1.0-cp313-cp313-musllinux_1_2_armv7l.whl", hash = "sha256:f3316adf8e9c334397b058544d6fa038a53abfb353f2c969c3f32272631eb6e5"},
+    {file = "propcache-0.1.0-cp313-cp313-musllinux_1_2_i686.whl", hash = "sha256:811812556c800f0c65f9b2d0cd0f7b6f5da3bb1ea39b0594f9e8a810fbf1a9f3"},
+    {file = "propcache-0.1.0-cp313-cp313-musllinux_1_2_ppc64le.whl", hash = "sha256:7437b0ba27392c0db63c5ad2530c718419d324b3093b22ab3e8b8a9a32710812"},
+    {file = "propcache-0.1.0-cp313-cp313-musllinux_1_2_s390x.whl", hash = "sha256:2215240ba1b6b72e04ac4e88913604aea61230de2f5a331f81006458050cbbb4"},
+    {file = "propcache-0.1.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:bfe03b4064cc1d5a4ff1ac9398c7ec284a26c39bb2e1b13f875ac442ffe4c618"},
+    {file = "propcache-0.1.0-cp313-cp313-win32.whl", hash = "sha256:be1c8df146fcd1136af52bbabbce434961f881f73a3396831ce6b08bf8fa223c"},
+    {file = "propcache-0.1.0-cp313-cp313-win_amd64.whl", hash = "sha256:ea617303cdd14a3a97009d2f392d332a9f8396fa35786618576a07f4c092a3c9"},
+    {file = "propcache-0.1.0-cp38-cp38-macosx_10_9_universal2.whl", hash = "sha256:8aa783bb5fce47b10a45c4e158150c8a2f909e4c3d46fc5495f7a835fb8a5d19"},
+    {file = "propcache-0.1.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:a3df0b69f93e6267d0094ae678e9995466794f112552685a85256da7fc80e994"},
+    {file = "propcache-0.1.0-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:4e220e1c93a9579738dfb2ef4f62f73bcdab0ddfc6220e4075a6fe10510651ba"},
+    {file = "propcache-0.1.0-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5bbe8a7fe2e6d88931f384bb57dbd0a7efb60f1e79a76be29404670f19a03139"},
+    {file = "propcache-0.1.0-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:1cde1f3a08d4a08463a1b70f4d900371b5ee489a9b8044b378114b6aac41af4c"},
+    {file = "propcache-0.1.0-cp38-cp38-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:93a1fbd9ec1bcd2c3392f15d57a2ef08558a4d67b36f23e91612dd5971e0bca1"},
+    {file = "propcache-0.1.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:78299224698b6415852f167f7bbf7439e3a0df5017c6ea7c4f13892496e84e8b"},
+    {file = "propcache-0.1.0-cp38-cp38-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:48621ad8e1e20625665a6a0b143037659223d52e34e70846fc711694f39d7a16"},
+    {file = "propcache-0.1.0-cp38-cp38-musllinux_1_2_aarch64.whl", hash = "sha256:ec76a381d0bde9b8846b6fbcf1fbe2eed0197ba707eb7bad30521f8d9d6090a1"},
+    {file = "propcache-0.1.0-cp38-cp38-musllinux_1_2_armv7l.whl", hash = "sha256:bc922b502bcb552d51a017108633c854e47b4722cbe421297ccdb97cfac70488"},
+    {file = "propcache-0.1.0-cp38-cp38-musllinux_1_2_i686.whl", hash = "sha256:e5480085af58efd2974a3969d0136789bfb1ca509599b6992f645dce7911785a"},
+    {file = "propcache-0.1.0-cp38-cp38-musllinux_1_2_ppc64le.whl", hash = "sha256:7dcb7bd6ecffd166314d741ee8bbef139185ae513d775565ab258eb1d6097ba3"},
+    {file = "propcache-0.1.0-cp38-cp38-musllinux_1_2_s390x.whl", hash = "sha256:78a2c6094eca38ebd14192226b51286e682ec969a34331b561ab278bfd69ecd7"},
+    {file = "propcache-0.1.0-cp38-cp38-musllinux_1_2_x86_64.whl", hash = "sha256:ed25bcd792b486d0060d04c191d03bc8bb07adcd81ca469ffefd47ab8e0a6d50"},
+    {file = "propcache-0.1.0-cp38-cp38-win32.whl", hash = "sha256:a7fd463278921710c65e40d4882f268dc7653c79976148e9d19d68f3723f6636"},
+    {file = "propcache-0.1.0-cp38-cp38-win_amd64.whl", hash = "sha256:dc23b881d298ac8a8c0fe66c536be068eccd2f2e7696fce543ddaadacc8769f2"},
+    {file = "propcache-0.1.0-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:ce3fd1e979cba94b284c7c3528ee54900f53d9f22c3984179b777bc84ec1de8e"},
+    {file = "propcache-0.1.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:6dff6b74c568fd7d84540c6d79405e18dfee292a458fda3cf625b734d6092740"},
+    {file = "propcache-0.1.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:1819e6b1daf5d7f309f29ceaf9c14e8bd7b12c8b06df5a4a8c8771d8dd9e1a67"},
+    {file = "propcache-0.1.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3e7c5474606e6c386b11056b8c36fa0fe0998c7ae912967052aa0927ddb2a829"},
+    {file = "propcache-0.1.0-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:fcc17f91011ed49102788c171ce8b1e827697c93e95535b47cefa233db1328bd"},
+    {file = "propcache-0.1.0-cp39-cp39-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:e5f314bf8fdc1d05da5e585086df9258ae036db9e8125cd51b6ce1ef5d425894"},
+    {file = "propcache-0.1.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:28d33abf204118ccca713e033a36b7df1b4a4e2641e25195276c7a57b6acc27b"},
+    {file = "propcache-0.1.0-cp39-cp39-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:14bd31f01fb7af5c66575e51d9561afa97d70894e58a7998db182fb90d5b66e3"},
+    {file = "propcache-0.1.0-cp39-cp39-musllinux_1_2_aarch64.whl", hash = "sha256:e666d5a3df37677fe2f5c3137fe57d4c4c4cc4735ebd6a6972323d9784aea85f"},
+    {file = "propcache-0.1.0-cp39-cp39-musllinux_1_2_armv7l.whl", hash = "sha256:9d703ae0db21b399d62f75fadc173bb23c48b2d9eb759a06893578e92c7216f6"},
+    {file = "propcache-0.1.0-cp39-cp39-musllinux_1_2_i686.whl", hash = "sha256:4b57a14c7eabab40ba5189b0c1251ee58f75eb528cecdfc607da72f31c624296"},
+    {file = "propcache-0.1.0-cp39-cp39-musllinux_1_2_ppc64le.whl", hash = "sha256:b79980f6f1c165e87211cddd90a9b521688fd80b00ab5f3da0b4562587ec7346"},
+    {file = "propcache-0.1.0-cp39-cp39-musllinux_1_2_s390x.whl", hash = "sha256:04e3fffb3b976b3c29f800620e2ba90dd2c12ba0a864dfb6f4b5768a8acea173"},
+    {file = "propcache-0.1.0-cp39-cp39-musllinux_1_2_x86_64.whl", hash = "sha256:ee392800c6bdad609c79617950608f1d01e813dbe3ddeffdb90eb980afdbf075"},
+    {file = "propcache-0.1.0-cp39-cp39-win32.whl", hash = "sha256:b97eae2a3277cea745dc85036d1e44d35da1effe47c444d6ade099be59f7fa4a"},
+    {file = "propcache-0.1.0-cp39-cp39-win_amd64.whl", hash = "sha256:139dd819fc585f26f4d902e38b1b97c0abc3997013663300725c4e88e602f59c"},
+    {file = "propcache-0.1.0-py3-none-any.whl", hash = "sha256:fd1abe3e0fb0c545cbbe215e863ed6ab424f8aab2a94e0e656cc02a8996c0edc"},
+    {file = "propcache-0.1.0.tar.gz", hash = "sha256:ef1b0c6a908cc61dda5208861f04da2c2502808c632bea82f84383793b9f1207"},
+]
 
 [[package]]
 name = "pycares"
