@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.2.2 (2025-02-04)
+
+### Bug Fixes
+
+- Only install async_timeout for python <3.11
+  ([#118](https://github.com/bdraco/aiodiscover/pull/118),
+  [`5efc0da`](https://github.com/bdraco/aiodiscover/commit/5efc0da431be00bc5657021675b28a615d04c77c))
+
+
 ## v2.2.1 (2025-02-04)
 
 ### Bug Fixes
