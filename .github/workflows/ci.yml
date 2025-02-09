@@ -60,7 +60,7 @@ jobs:
         run: |
           poetry install --only=main,dev
       - name: Test with Pytest
-        run: poetry run pytest
+        run: poetry run pytest --cov --cov-report=xml --cov-report=term-missing
         shell: bash
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
