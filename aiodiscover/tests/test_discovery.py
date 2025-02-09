@@ -108,35 +108,32 @@ async def test_async_query_for_ptrs() -> None:
 
 
 @pytest.mark.asyncio
-async def test_async_discover_nameservers_excludes_router_when_in_network_nameserver() -> (
-    None
-):
-    """Verify async_get_nameservers excludes the router when there is an in-network nameserver."""
+async def test_nameservers_excludes_router_when_in_network_nameserver() -> None:
+    """Verifynameservers excludes the router when there is an in-network nameserver."""
     discover_hosts = discovery.DiscoverHosts()
     net_data = SystemNetworkData(None, None)
     net_data.router_ip = IPv4Address("192.168.0.1")
     net_data.network = IPv4Network("192.168.0.0/24")
-    net_data.nameservers = [IPv4Address("192.168.0.254")]
+    net_data.nameservers = [IPv4Address("192.168.0.254"), IPv4Address("172.0.0.4")]
     with patch.object(
         net_data,
         "async_get_neighbours",
         return_value={"192.168.0.1": "AA:BB:CC:DD:EE:FF"},
     ):
         assert await discover_hosts._async_get_nameservers(net_data) == [
-            IPv4Address("192.168.0.254")
+            IPv4Address("192.168.0.254"),
+            IPv4Address("172.0.0.4"),
         ]
 
 
 @pytest.mark.asyncio
-async def test_async_discover_nameservers_includes_router_not_in_network_nameserver() -> (
-    None
-):
-    """Verify async_get_nameservers includes the router when no in-network nameserver."""
+async def test_nameservers_includes_router_no_in_network_nameserver() -> None:
+    """Verify nameservers includes the router when no in-network nameserver and it responds to ARP."""
     discover_hosts = discovery.DiscoverHosts()
     net_data = SystemNetworkData(None, None)
     net_data.router_ip = IPv4Address("192.168.0.1")
     net_data.network = IPv4Network("192.168.0.0/24")
-    net_data.nameservers = [IPv4Address("172.0.0.3")]
+    net_data.nameservers = [IPv4Address("172.0.0.3"), IPv4Address("172.0.0.4")]
     with patch.object(
         net_data,
         "async_get_neighbours",
@@ -145,6 +142,26 @@ async def test_async_discover_nameservers_includes_router_not_in_network_nameser
         assert await discover_hosts._async_get_nameservers(net_data) == [
             IPv4Address("192.168.0.1"),
             IPv4Address("172.0.0.3"),
+            IPv4Address("172.0.0.4"),
+        ]
+
+
+@pytest.mark.asyncio
+async def test_nameservers_includes_router_no_in_network_nameserver_no_arp() -> None:
+    """Verify nameservers excludes the router when no in-network nameserver and no ARP response."""
+    discover_hosts = discovery.DiscoverHosts()
+    net_data = SystemNetworkData(None, None)
+    net_data.router_ip = IPv4Address("192.168.0.1")
+    net_data.network = IPv4Network("192.168.0.0/24")
+    net_data.nameservers = [IPv4Address("172.0.0.3"), IPv4Address("172.0.0.4")]
+    with patch.object(
+        net_data,
+        "async_get_neighbours",
+        return_value={},
+    ):
+        assert await discover_hosts._async_get_nameservers(net_data) == [
+            IPv4Address("172.0.0.3"),
+            IPv4Address("172.0.0.4"),
         ]
 
 
