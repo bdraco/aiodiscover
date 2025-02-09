@@ -48,7 +48,7 @@ async def test_async_discover_hosts_with_dns_mock_neighbor_mock() -> None:
     discover_hosts.async_get_hostnames = _async_get_hostnames  # type: ignore
     with (
         patch(
-            "aiodiscover.network.SystemNetworkData.async_get_neighbors",
+            "aiodiscover.network.SystemNetworkData.async_get_neighbours",
             return_value={
                 "1.2.3.4": "aa:bb:cc:dd:ee:ff",
                 "4.5.5.6": "ff:bb:cc:0d:ee:ff",
