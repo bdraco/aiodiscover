@@ -134,17 +134,21 @@ class DiscoverHosts:
         ]
 
     async def _async_get_nameservers(
-        self, sys_network_data: SystemNetworkData
+        self, net_data: SystemNetworkData
     ) -> list[IPv4Address | IPv6Address]:
         """Get nameservers to query."""
-        all_nameservers = list(sys_network_data.nameservers)
-        router_ip = sys_network_data.router_ip
-        assert router_ip is not None
-        if router_ip not in all_nameservers:
-            neighbours = await sys_network_data.async_get_neighbours([str(router_ip)])
-            if router_ip in neighbours:
-                all_nameservers.insert(0, router_ip)
-        return all_nameservers
+        if (
+            # If the Router IP is known
+            (router_ip := net_data.router_ip)
+            # And the router IP is not already a nameserver
+            and router_ip not in net_data.nameservers
+            # If there are no in-network nameservers
+            and not any(ip in net_data.network for ip in net_data.nameservers)
+            # And the router responds to ARP
+            and str(router_ip) in await net_data.async_get_neighbours([str(router_ip)])
+        ):
+            return [router_ip, *net_data.nameservers]
+        return net_data.nameservers
 
     async def async_get_hostnames(
         self, sys_network_data: SystemNetworkData
