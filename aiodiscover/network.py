@@ -13,8 +13,6 @@ import ifaddr
 from cached_ipaddress import cached_ip_addresses
 from ifaddr import Adapter
 
-from .util import asyncio_timeout
-
 if TYPE_CHECKING:
     from pyroute2.iproute import IPRoute
 # Some MAC addresses will drop the leading zero so
@@ -229,9 +227,9 @@ class SystemNetworkData:
             close_fds=False,
         )
         try:
-            async with asyncio_timeout(ARP_TIMEOUT):
+            async with asyncio.timeout(ARP_TIMEOUT):
                 out_data, _ = await arp.communicate()
-        except asyncio.TimeoutError:
+        except TimeoutError:
             if arp:
                 with suppress(TypeError):
                     await arp.kill()  # type: ignore

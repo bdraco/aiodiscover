@@ -1,5 +1,7 @@
 """Top-level package for Async Host discovery."""
 
+from __future__ import annotations
+
 __author__ = "J. Nick Koston"
 __email__ = "nick@koston.org"
 # Do not edit this string manually, always use bumpversion
