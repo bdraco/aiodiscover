@@ -46,6 +46,11 @@ def load_resolv_conf() -> list[IPv4Address | IPv6Address]:
     """Load the resolv.conf."""
     with open("/etc/resolv.conf") as file:
         lines = tuple(file)
+    return parse_resolv_conf(lines)
+
+
+def parse_resolv_conf(lines: Iterable[str]) -> list[IPv4Address | IPv6Address]:
+    """Parse the resolv.conf."""
     nameservers: list[IPv4Address | IPv6Address] = []
     for line in lines:
         line = line.strip()
