@@ -5,8 +5,7 @@ import logging
 from collections.abc import Iterable
 from contextlib import suppress
 from functools import lru_cache, partial
-from ipaddress import IPv4Address, ip_address
-from ipaddress import IPv4Address, IPv6Address
+from ipaddress import IPv4Address, IPv6Address, ip_address
 from itertools import islice
 from typing import TYPE_CHECKING, Any, cast
 
