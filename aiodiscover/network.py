@@ -108,7 +108,7 @@ def get_router_ip(ipr: IPRoute) -> IPv4Address | None:
     )
 
 
-def _fill_neighbor(neighbours: dict[str, str], ip: str, mac: str) -> None:
+def _fill_neighbor(neighbors: dict[str, str], ip: str, mac: str) -> None:
     """Add a neighbor if it is valid."""
     if not (ip_addr := cached_ip_addresses(ip)):
         return
@@ -124,7 +124,7 @@ def _fill_neighbor(neighbours: dict[str, str], ip: str, mac: str) -> None:
     mac = ":".join([i.zfill(2) for i in mac.split(":")])
     if mac in IGNORE_MACS:
         return
-    neighbours[ip] = mac
+    neighbors[ip] = mac
 
 
 def async_populate_arp(ip_addresses: Iterable[str]) -> socket.socket:
@@ -213,7 +213,7 @@ class SystemNetworkData:
 
     async def _async_get_neighbors_arp(self) -> dict[str, str]:
         """Get neighbors with arp command."""
-        neighbours: dict[str, str] = {}
+        neighbors: dict[str, str] = {}
         arp = await asyncio.create_subprocess_exec(
             "arp",
             "-a",
@@ -231,9 +231,9 @@ class SystemNetworkData:
                 with suppress(TypeError):
                     await arp.kill()  # type: ignore
                 del arp
-            return neighbours
+            return neighbors
         except AttributeError:
-            return neighbours
+            return neighbors
 
         for line in out_data.decode().splitlines():
             chomped = line.strip()
@@ -242,20 +242,20 @@ class SystemNetworkData:
                 continue
             ip = data[1].strip("()")
             mac = data[3]
-            _fill_neighbor(neighbours, ip, mac)
+            _fill_neighbor(neighbors, ip, mac)
 
-        return neighbours
+        return neighbors
 
     async def _async_get_neighbors_ip_route(self) -> dict[str, str]:
         """Get neighbors with pyroute2."""
-        neighbours: dict[str, str] = {}
+        neighbors: dict[str, str] = {}
         loop = asyncio.get_running_loop()
         # This shouldn't ever block but it does
         # interact with netlink so its safer to run
         # in the executor
         if TYPE_CHECKING:
             assert self.ip_route is not None
-        for neighbour in await loop.run_in_executor(None, self.ip_route.get_neighbours):
+        for neighbour in await loop.run_in_executor(None, self.ip_route.get_neighbors):
             ip = None
             mac = None
             for key, value in neighbour["attrs"]:
@@ -264,6 +264,6 @@ class SystemNetworkData:
                 elif key == "NDA_LLADDR":
                     mac = value
             if ip and mac:
-                _fill_neighbor(neighbours, ip, mac)
+                _fill_neighbor(neighbors, ip, mac)
 
-        return neighbours
+        return neighbors
