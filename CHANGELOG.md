@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.3.0 (2025-02-09)
+
+### Features
+
+- Improve typing by using ip_address objects in more places
+  ([#120](https://github.com/bdraco/aiodiscover/pull/120),
+  [`8fe56ea`](https://github.com/bdraco/aiodiscover/commit/8fe56eae91c02d7e47268b986ba3f641c4e2acd3))
+
+
 ## v2.2.2 (2025-02-04)
 
 ### Bug Fixes
