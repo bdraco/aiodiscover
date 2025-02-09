@@ -5,7 +5,7 @@ import logging
 from collections.abc import Iterable
 from contextlib import suppress
 from functools import lru_cache, partial
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv6Address
 from itertools import islice
 from typing import TYPE_CHECKING, Any, cast
 
@@ -122,27 +122,27 @@ class DiscoverHosts:
             )
             return []
         hostnames = await self.async_get_hostnames(sys_network_data)
-        neighbours = await sys_network_data.async_get_neighbors(hostnames.keys())
+        neighbors = await sys_network_data.async_get_neighbors(hostnames.keys())
         return [
             {
                 HOSTNAME: hostname,
-                MAC_ADDRESS: neighbours[ip],
+                MAC_ADDRESS: neighbors[ip],
                 IP_ADDRESS: ip,
             }
             for ip, hostname in hostnames.items()
-            if ip in neighbours
+            if ip in neighbors
         ]
 
     async def _async_get_nameservers(
         self, sys_network_data: SystemNetworkData
-    ) -> list[str]:
+    ) -> list[IPv4Address | IPv6Address]:
         """Get nameservers to query."""
         all_nameservers = list(sys_network_data.nameservers)
         router_ip = sys_network_data.router_ip
         assert router_ip is not None
         if router_ip not in all_nameservers:
-            neighbours = await sys_network_data.async_get_neighbors([router_ip])
-            if router_ip in neighbours:
+            neighbors = await sys_network_data.async_get_neighbors([str(router_ip)])
+            if router_ip in neighbors:
                 all_nameservers.insert(0, router_ip)
         return all_nameservers
 
@@ -156,7 +156,7 @@ class DiscoverHosts:
         hostnames: dict[str, str] = {}
         for nameserver in all_nameservers:
             ips_to_lookup = [ip for ip in ips if str(ip) not in hostnames]
-            results = await async_query_for_ptrs(nameserver, ips_to_lookup)
+            results = await async_query_for_ptrs(str(nameserver), ips_to_lookup)
             for idx, ip in enumerate(ips_to_lookup):
                 short_host = dns_message_short_hostname(results[idx])
                 if short_host is None:

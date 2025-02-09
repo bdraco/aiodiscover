@@ -6,11 +6,12 @@ import socket
 import sys
 from collections.abc import Iterable
 from contextlib import suppress
-from ipaddress import IPv4Network, ip_network
+from ipaddress import IPv4Address, IPv4Network, IPv6Address, ip_network
 from typing import TYPE_CHECKING, Any
 
-import ifaddr  # type: ignore
+import ifaddr
 from cached_ipaddress import cached_ip_addresses
+from ifaddr import Adapter
 
 from .util import asyncio_timeout
 
@@ -41,11 +42,11 @@ LOOPBACK_TARGET_IP = "127.0.0.1"
 IGNORE_MACS = {"00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff"}
 
 
-def load_resolv_conf() -> list[str]:
+def load_resolv_conf() -> list[IPv4Address | IPv6Address]:
     """Load the resolv.conf."""
     with open("/etc/resolv.conf") as file:
         lines = tuple(file)
-    nameservers = set()
+    nameservers: list[IPv4Address | IPv6Address] = []
     for line in lines:
         line = line.strip()
         if not len(line):
@@ -54,28 +55,28 @@ def load_resolv_conf() -> list[str]:
             continue
         key, value = line.split(None, 1)
         if key == "nameserver":
-            if ip_addr := cached_ip_addresses(value):
-                nameservers.add(ip_addr)
-    return list(nameservers)
+            if (ip_addr := cached_ip_addresses(value)) and ip_addr not in nameservers:
+                nameservers.append(ip_addr)
+    return nameservers
 
 
-def get_local_ip(target: str = DEFAULT_TARGET) -> str | None:
+def get_local_ip(target: str = DEFAULT_TARGET) -> IPv4Address | None:
     """Find the local ip address."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setblocking(False)
     try:
         s.connect((target, 1))
-        return s.getsockname()[0]
+        return cached_ip_addresses(s.getsockname()[0])
     except Exception:
         return None
     finally:
         s.close()
 
 
-def get_network(local_ip: str, adapters: Any) -> IPv4Network:
+def get_network(local_ip: IPv4Address, adapters: list[Adapter]) -> IPv4Network:
     """Search adapters for the network and broadcast ip."""
     network_prefix = (
-        get_ip_prefix_from_adapters(local_ip, adapters) or DEFAULT_NETWORK_PREFIX
+        get_ip_prefix_from_adapters(str(local_ip), adapters) or DEFAULT_NETWORK_PREFIX
     )
     network = ip_network(f"{local_ip}/{network_prefix}", False)
     if TYPE_CHECKING:
@@ -83,7 +84,7 @@ def get_network(local_ip: str, adapters: Any) -> IPv4Network:
     return network
 
 
-def get_ip_prefix_from_adapters(local_ip: str, adapters: Any) -> int | None:
+def get_ip_prefix_from_adapters(local_ip: str, adapters: list[Adapter]) -> int | None:
     """Find the network prefix for an adapter."""
     for adapter in adapters:
         for ip in adapter.ips:
@@ -92,16 +93,19 @@ def get_ip_prefix_from_adapters(local_ip: str, adapters: Any) -> int | None:
     return None
 
 
-def get_attrs_key(data: Any, key: Any) -> Any:
+def get_attrs_key(data: Any, key: Any) -> str | None:
     """Lookup an attrs key in pyroute2 data."""
     for attr_key, attr_value in data["attrs"]:
         if attr_key == key:
             return attr_value
+    return None
 
 
-def get_router_ip(ipr: IPRoute) -> Any:
+def get_router_ip(ipr: IPRoute) -> IPv4Address | None:
     """Obtain the router ip from the default route."""
-    return get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
+    return cached_ip_addresses(
+        get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
+    )
 
 
 def _fill_neighbor(neighbours: dict[str, str], ip: str, mac: str) -> None:
@@ -138,15 +142,16 @@ def async_populate_arp(ip_addresses: Iterable[str]) -> socket.socket:
 class SystemNetworkData:
     """Gather system network data."""
 
+    network: IPv4Network
+    adapters: list[Adapter]
+    nameservers: list[IPv4Address | IPv6Address]
+    router_ip: IPv4Address | None = None
+    local_ip: IPv4Address | None = None
+
     def __init__(self, ip_route: IPRoute | None, local_ip: str | None = None) -> None:
         """Init system network data."""
         self.ip_route = ip_route
-        self.local_ip = local_ip
-        self.broadcast_ip: str | None = None
-        self.router_ip: str | None = None
-        self.network: IPv4Network | None = None
-        self.adapters: Any = None
-        self.nameservers: list[str] = []
+        self.local_ip = cached_ip_addresses(local_ip) if local_ip else None
 
     def setup(self) -> None:
         """Obtain the local network data."""
@@ -157,11 +162,11 @@ class SystemNetworkData:
                 raise
         else:
             self.nameservers = [
-                str(ip_addr)
+                ip_addr
                 for ip_addr in resolvers
                 if any(ip_addr in network for network in PRIVATE_AND_LOCAL_NETWORKS)
             ]
-        self.adapters = ifaddr.get_adapters()
+        self.adapters = list(ifaddr.get_adapters())
         if not self.local_ip:
             self.local_ip = (
                 get_local_ip(DEFAULT_TARGET)
@@ -181,10 +186,12 @@ class SystemNetworkData:
             with suppress(Exception):
                 import netifaces  # type: ignore # pylint: disable=import-outside-toplevel
 
-                self.router_ip = netifaces.gateways()["default"][netifaces.AF_INET][0]
+                self.router_ip = cached_ip_addresses(
+                    netifaces.gateways()["default"][netifaces.AF_INET][0]
+                )
         if not self.router_ip:
             network_address = str(self.network.network_address)
-            self.router_ip = f"{network_address[:-1]}1"
+            self.router_ip = cached_ip_addresses(f"{network_address[:-1]}1")
 
     async def async_get_neighbors(self, ips: Iterable[str]) -> dict[str, str]:
         """Get neighbors with best available method."""
