@@ -122,15 +122,15 @@ class DiscoverHosts:
             )
             return []
         hostnames = await self.async_get_hostnames(sys_network_data)
-        neighbors = await sys_network_data.async_get_neighbors(hostnames.keys())
+        neighbours = await sys_network_data.async_get_neighbours(hostnames.keys())
         return [
             {
                 HOSTNAME: hostname,
-                MAC_ADDRESS: neighbors[ip],
+                MAC_ADDRESS: neighbours[ip],
                 IP_ADDRESS: ip,
             }
             for ip, hostname in hostnames.items()
-            if ip in neighbors
+            if ip in neighbours
         ]
 
     async def _async_get_nameservers(
@@ -141,8 +141,8 @@ class DiscoverHosts:
         router_ip = sys_network_data.router_ip
         assert router_ip is not None
         if router_ip not in all_nameservers:
-            neighbors = await sys_network_data.async_get_neighbors([str(router_ip)])
-            if router_ip in neighbors:
+            neighbours = await sys_network_data.async_get_neighbours([str(router_ip)])
+            if router_ip in neighbours:
                 all_nameservers.insert(0, router_ip)
         return all_nameservers
 

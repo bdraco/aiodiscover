@@ -108,7 +108,7 @@ def get_router_ip(ipr: IPRoute) -> IPv4Address | None:
     )
 
 
-def _fill_neighbor(neighbors: dict[str, str], ip: str, mac: str) -> None:
+def _fill_neighbor(neighbours: dict[str, str], ip: str, mac: str) -> None:
     """Add a neighbor if it is valid."""
     if not (ip_addr := cached_ip_addresses(ip)):
         return
@@ -124,7 +124,7 @@ def _fill_neighbor(neighbors: dict[str, str], ip: str, mac: str) -> None:
     mac = ":".join([i.zfill(2) for i in mac.split(":")])
     if mac in IGNORE_MACS:
         return
-    neighbors[ip] = mac
+    neighbours[ip] = mac
 
 
 def async_populate_arp(ip_addresses: Iterable[str]) -> socket.socket:
@@ -193,27 +193,27 @@ class SystemNetworkData:
             network_address = str(self.network.network_address)
             self.router_ip = cached_ip_addresses(f"{network_address[:-1]}1")
 
-    async def async_get_neighbors(self, ips: Iterable[str]) -> dict[str, str]:
-        """Get neighbors with best available method."""
-        neighbors = await self._async_get_neighbors()
-        ips_missing_arp = [ip for ip in ips if ip not in neighbors]
+    async def async_get_neighbours(self, ips: Iterable[str]) -> dict[str, str]:
+        """Get neighbours with best available method."""
+        neighbours = await self._async_get_neighbours()
+        ips_missing_arp = [ip for ip in ips if ip not in neighbours]
         if not ips_missing_arp:
-            return neighbors
+            return neighbours
         sock = async_populate_arp(ips_missing_arp)
         await asyncio.sleep(ARP_CACHE_POPULATE_TIME)
         sock.close()
-        neighbors.update(await self._async_get_neighbors())
-        return neighbors
+        neighbours.update(await self._async_get_neighbours())
+        return neighbours
 
-    async def _async_get_neighbors(self) -> dict[str, str]:
-        """Get neighbors from the arp table."""
+    async def _async_get_neighbours(self) -> dict[str, str]:
+        """Get neighbours from the arp table."""
         if self.ip_route:
-            return await self._async_get_neighbors_ip_route()
-        return await self._async_get_neighbors_arp()
+            return await self._async_get_neighbours_ip_route()
+        return await self._async_get_neighbours_arp()
 
-    async def _async_get_neighbors_arp(self) -> dict[str, str]:
-        """Get neighbors with arp command."""
-        neighbors: dict[str, str] = {}
+    async def _async_get_neighbours_arp(self) -> dict[str, str]:
+        """Get neighbours with arp command."""
+        neighbours: dict[str, str] = {}
         arp = await asyncio.create_subprocess_exec(
             "arp",
             "-a",
@@ -231,9 +231,9 @@ class SystemNetworkData:
                 with suppress(TypeError):
                     await arp.kill()  # type: ignore
                 del arp
-            return neighbors
+            return neighbours
         except AttributeError:
-            return neighbors
+            return neighbours
 
         for line in out_data.decode().splitlines():
             chomped = line.strip()
@@ -242,20 +242,20 @@ class SystemNetworkData:
                 continue
             ip = data[1].strip("()")
             mac = data[3]
-            _fill_neighbor(neighbors, ip, mac)
+            _fill_neighbor(neighbours, ip, mac)
 
-        return neighbors
+        return neighbours
 
-    async def _async_get_neighbors_ip_route(self) -> dict[str, str]:
-        """Get neighbors with pyroute2."""
-        neighbors: dict[str, str] = {}
+    async def _async_get_neighbours_ip_route(self) -> dict[str, str]:
+        """Get neighbours with pyroute2."""
+        neighbours: dict[str, str] = {}
         loop = asyncio.get_running_loop()
         # This shouldn't ever block but it does
         # interact with netlink so its safer to run
         # in the executor
         if TYPE_CHECKING:
             assert self.ip_route is not None
-        for neighbour in await loop.run_in_executor(None, self.ip_route.get_neighbors):
+        for neighbour in await loop.run_in_executor(None, self.ip_route.get_neighbours):
             ip = None
             mac = None
             for key, value in neighbour["attrs"]:
@@ -264,6 +264,6 @@ class SystemNetworkData:
                 elif key == "NDA_LLADDR":
                     mac = value
             if ip and mac:
-                _fill_neighbor(neighbors, ip, mac)
+                _fill_neighbor(neighbours, ip, mac)
 
-        return neighbors
+        return neighbours
