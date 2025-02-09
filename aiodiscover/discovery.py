@@ -143,9 +143,9 @@ class DiscoverHosts:
             # And the router IP is not already a nameserver
             and router_ip not in net_data.nameservers
             # If there are no in-network nameservers
-            and not any(ip_addr in net_data.network for ip_addr in net_data.nameservers)
+            and not any(ip in net_data.network for ip in net_data.nameservers)
             # And the router responds to ARP
-            and router_ip in await net_data.async_get_neighbours([str(router_ip)])
+            and str(router_ip) in await net_data.async_get_neighbours([str(router_ip)])
         ):
             return [router_ip, *net_data.nameservers]
         return net_data.nameservers

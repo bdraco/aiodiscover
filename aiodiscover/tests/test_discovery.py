@@ -9,6 +9,7 @@ from unittest.mock import patch
 import pytest
 
 from aiodiscover import discovery
+from aiodiscover.network import SystemNetworkData
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -104,6 +105,47 @@ async def test_async_query_for_ptrs() -> None:
     assert response[0].name == "name1"  # type: ignore
     assert response[1] is None  # type: ignore
     assert response[2].name == "name3"  # type: ignore
+
+
+@pytest.mark.asyncio
+async def test_async_discover_nameservers_excludes_router_when_in_network_nameserver() -> (
+    None
+):
+    """Verify async_get_nameservers excludes the router when there is an in-network nameserver."""
+    discover_hosts = discovery.DiscoverHosts()
+    net_data = SystemNetworkData(None, None)
+    net_data.router_ip = IPv4Address("192.168.0.1")
+    net_data.network = IPv4Network("192.168.0.0/24")
+    net_data.nameservers = [IPv4Address("192.168.0.254")]
+    with patch.object(
+        net_data,
+        "async_get_neighbours",
+        return_value={"192.168.0.1": "AA:BB:CC:DD:EE:FF"},
+    ):
+        assert await discover_hosts._async_get_nameservers(net_data) == [
+            IPv4Address("192.168.0.254")
+        ]
+
+
+@pytest.mark.asyncio
+async def test_async_discover_nameservers_includes_router_not_in_network_nameserver() -> (
+    None
+):
+    """Verify async_get_nameservers includes the router when no in-network nameserver."""
+    discover_hosts = discovery.DiscoverHosts()
+    net_data = SystemNetworkData(None, None)
+    net_data.router_ip = IPv4Address("192.168.0.1")
+    net_data.network = IPv4Network("192.168.0.0/24")
+    net_data.nameservers = [IPv4Address("172.0.0.3")]
+    with patch.object(
+        net_data,
+        "async_get_neighbours",
+        return_value={"192.168.0.1": "AA:BB:CC:DD:EE:FF"},
+    ):
+        assert await discover_hosts._async_get_nameservers(net_data) == [
+            IPv4Address("192.168.0.1"),
+            IPv4Address("172.0.0.3"),
+        ]
 
 
 @pytest.mark.asyncio
