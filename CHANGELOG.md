@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v2.4.0 (2025-02-09)
+
+### Features
+
+- Exclude router IP if there is an in-network nameserver
+  ([#121](https://github.com/bdraco/aiodiscover/pull/121),
+  [`24dd362`](https://github.com/bdraco/aiodiscover/commit/24dd3624997cfd4dbe7a318eac0ae6f159816780))
+
+
 ## v2.3.0 (2025-02-09)
 
 ### Features
