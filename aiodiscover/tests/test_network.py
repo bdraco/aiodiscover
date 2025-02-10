@@ -19,7 +19,7 @@ def test_parse_resolv_conf() -> None:
             "nameserver 3.3.4.3",
             "   nameserver   32.2.1.1   ",
             " nameserver        2001:4860:4860::8888",
-        ]
+        ],
     )
     assert resolv_conf == [
         IPv4Address("3.3.4.3"),

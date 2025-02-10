@@ -36,7 +36,8 @@ async def test_async_discover_hosts_with_dns_mock() -> None:
     with (
         patch.object(discovery, "MAX_ADDRESSES", 2),
         patch(
-            "aiodiscover.discovery.dns_message_short_hostname", return_value="router"
+            "aiodiscover.discovery.dns_message_short_hostname",
+            return_value="router",
         ),
     ):
         hosts = await discover_hosts.async_discover()
@@ -301,7 +302,8 @@ async def test_async_get_hostnames_first_nameserver_fails() -> None:
     queries: list[tuple[str, list[IPv4Address]]] = []
 
     async def _mock_query_for_ptrs(
-        nameserver: str, ips_to_lookup: list[IPv4Address]
+        nameserver: str,
+        ips_to_lookup: list[IPv4Address],
     ) -> Any:
         queries.append((nameserver, ips_to_lookup))
         if nameserver == str(IPv4Address("172.0.0.4")):
