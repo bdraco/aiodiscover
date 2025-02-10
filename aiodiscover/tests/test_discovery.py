@@ -350,3 +350,25 @@ async def test_async_get_hostnames_first_nameserver_fails() -> None:
 
         assert hostnames == {str(ip): "xyz" for ip in hosts}
         assert discover_hosts._failed_nameservers == {IPv4Address("172.0.0.3")}
+
+
+@pytest.mark.asyncio
+async def test_cache_clear() -> None:
+    """Verify async_get_hostnames when the first nameserver fails."""
+    loop = asyncio.get_running_loop()
+    with patch.object(loop, "time", return_value=0) as mock_time:
+        discover_hosts = discovery.DiscoverHosts()
+        net_data = SystemNetworkData(None, None)
+        net_data.router_ip = IPv4Address("192.168.0.1")
+        net_data.network = IPv4Network("192.168.0.0/31")
+        net_data.nameservers = [IPv4Address("172.0.0.3"), IPv4Address("172.0.0.4")]
+        discover_hosts._failed_nameservers = {IPv4Address("172.0.0.3")}
+        assert discover_hosts._last_cache_clear == 0
+        discover_hosts._cleanup_cache()
+        assert discover_hosts._failed_nameservers == {IPv4Address("172.0.0.3")}
+        mock_time.return_value = discovery.CACHE_CLEAR_INTERVAL - 10
+        discover_hosts._cleanup_cache()
+        assert discover_hosts._failed_nameservers == {IPv4Address("172.0.0.3")}
+        mock_time.return_value = discovery.CACHE_CLEAR_INTERVAL + 10
+        discover_hosts._cleanup_cache()
+        assert discover_hosts._failed_nameservers == set()
