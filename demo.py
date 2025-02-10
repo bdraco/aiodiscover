@@ -1,8 +1,14 @@
 import asyncio
+import logging
 import pprint
 
 from aiodiscover import DiscoverHosts
 
-discover_hosts = DiscoverHosts()
-hosts = asyncio.run(discover_hosts.async_discover())
-pprint.pprint(hosts)
+logging.basicConfig(level=logging.DEBUG)
+
+
+async def run() -> None:
+    pprint.pprint(await DiscoverHosts().async_discover())
+
+
+asyncio.run(run())

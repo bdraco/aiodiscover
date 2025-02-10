@@ -79,6 +79,8 @@ prerelease = true
 [tool.pytest.ini_options]
 addopts = "-v -Wdefault --cov=aiodiscover --cov-report=term-missing:skip-covered"
 pythonpath = ["src"]
+log_cli="true"
+log_level="NOTSET"
 
 [tool.coverage.run]
 branch = true
@@ -178,3 +180,5 @@ ignore_errors = true
 [build-system]
 requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
