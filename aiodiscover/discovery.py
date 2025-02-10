@@ -24,8 +24,8 @@ QUERY_BUCKET_SIZE = 64
 
 DNS_RESPONSE_TIMEOUT = 2
 
-# 12 hours
-CACHE_CLEAR_INTERVAL = 60 * 60 * 12
+# 24 hours
+CACHE_CLEAR_INTERVAL = 60 * 60 * 24
 
 
 _LOGGER = logging.getLogger(__name__)
