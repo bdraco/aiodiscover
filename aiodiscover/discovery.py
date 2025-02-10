@@ -24,6 +24,9 @@ QUERY_BUCKET_SIZE = 64
 
 DNS_RESPONSE_TIMEOUT = 2
 
+# 12 hours
+CACHE_CLEAR_INTERVAL = 60 * 60 * 12
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -88,32 +91,43 @@ class DiscoverHosts:
 
     def __init__(self) -> None:
         """Init the discovery hosts."""
+        loop = asyncio.get_running_loop()
+        self._loop = loop
         self._sys_network_data: SystemNetworkData | None = None
+        self._failed_nameservers: set[IPv4Address | IPv6Address] = set()
+        self._last_cache_clear = loop.time()
 
-    def _setup_sys_network_data(self) -> None:
+    def _setup_sys_network_data(self) -> SystemNetworkData:
         ip_route: IPRoute | None = None
         with suppress(Exception):
-            from pyroute2.iproute import (
-                IPRoute,
-            )
+            from pyroute2.iproute import IPRoute
 
             ip_route = IPRoute()
         sys_network_data = SystemNetworkData(ip_route)
         sys_network_data.setup()
-        self._sys_network_data = sys_network_data
+        return sys_network_data
+
+    def _cleanup_cache(self) -> None:
+        """
+        Clear the cache of failed nameservers.
+
+        Just because a nameserver failed once doesn't mean it will fail again
+        as it may have been a transient issue. Our goal is to avoid spamming
+        the same nameservers over and over if they are unresponsive, but not
+        to permanently skip them since they may become responsive again.
+        """
+        if self._loop.time() - self._last_cache_clear > CACHE_CLEAR_INTERVAL:
+            self._failed_nameservers.clear()
+            self._last_cache_clear = self._loop.time()
 
     async def async_discover(self) -> list[dict[str, str]]:
         """Discover hosts on the network by ARP and PTR lookup."""
         if not self._sys_network_data:
-            await asyncio.get_running_loop().run_in_executor(
+            self._sys_network_data = await self._loop.run_in_executor(
                 None, self._setup_sys_network_data
             )
-        if TYPE_CHECKING:
-            assert self._sys_network_data is not None
         sys_network_data = self._sys_network_data
         network = sys_network_data.network
-        if TYPE_CHECKING:
-            assert network is not None
         if network.num_addresses > MAX_ADDRESSES:
             _LOGGER.debug(
                 "The network %s exceeds the maximum number of addresses, %s; No scanning performed",
@@ -121,6 +135,7 @@ class DiscoverHosts:
                 MAX_ADDRESSES,
             )
             return []
+        self._cleanup_cache()
         hostnames = await self.async_get_hostnames(sys_network_data)
         neighbours = await sys_network_data.async_get_neighbours(hostnames.keys())
         return [
@@ -155,12 +170,19 @@ class DiscoverHosts:
     ) -> dict[str, str]:
         """Lookup PTR records for all addresses in the network."""
         all_nameservers = await self._async_get_nameservers(sys_network_data)
-        assert sys_network_data.network is not None
         ips = list(sys_network_data.network.hosts())
         hostnames: dict[str, str] = {}
+        failed_nameservers_this_run: set[IPv4Address | IPv6Address] = set()
         for nameserver in all_nameservers:
+            if nameserver in self._failed_nameservers:
+                _LOGGER.debug("Skipping previously failed nameserver %s", nameserver)
+                continue
             ips_to_lookup = [ip for ip in ips if str(ip) not in hostnames]
             results = await async_query_for_ptrs(str(nameserver), ips_to_lookup)
+            if not results:
+                _LOGGER.debug("No results from %s", nameserver)
+                failed_nameservers_this_run.add(nameserver)
+                continue
             for idx, ip in enumerate(ips_to_lookup):
                 short_host = dns_message_short_hostname(results[idx])
                 if short_host is None:
@@ -170,4 +192,8 @@ class DiscoverHosts:
                 # As soon as we have a responsive nameserver, there
                 # is no need to query additional fallbacks
                 break
+        if hostnames:
+            # If we have any working nameservers, keep track of which
+            # ones failed this run so we don't try them again
+            self._failed_nameservers.update(failed_nameservers_this_run)
         return hostnames
