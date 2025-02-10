@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.5.0 (2025-02-10)
+
+### Features
+
+- Check the router ip last ([#125](https://github.com/bdraco/aiodiscover/pull/125),
+  [`a0a3fb3`](https://github.com/bdraco/aiodiscover/commit/a0a3fb3b7ea0297feff3483b3a8ba1adfddad750))
+
+
 ## v2.4.0 (2025-02-09)
 
 ### Features
