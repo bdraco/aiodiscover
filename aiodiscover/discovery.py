@@ -116,9 +116,10 @@ class DiscoverHosts:
         the same nameservers over and over if they are unresponsive, but not
         to permanently skip them since they may become responsive again.
         """
-        if self._loop.time() - self._last_cache_clear > CACHE_CLEAR_INTERVAL:
+        now = self._loop.time()
+        if now - self._last_cache_clear > CACHE_CLEAR_INTERVAL:
             self._failed_nameservers.clear()
-            self._last_cache_clear = self._loop.time()
+            self._last_cache_clear = now
 
     async def async_discover(self) -> list[dict[str, str]]:
         """Discover hosts on the network by ARP and PTR lookup."""

@@ -15,6 +15,11 @@ if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
+@dataclass
+class MockReply:
+    name: str
+
+
 @pytest.mark.asyncio
 async def test_async_discover_hosts() -> None:
     """Verify discover hosts does not throw."""
@@ -73,10 +78,6 @@ async def test_async_query_for_ptrs() -> None:
     """Test async_query_for_ptrs handles missing ips."""
     loop = asyncio.get_running_loop()
     count = 0
-
-    @dataclass
-    class MockReply:
-        name: str
 
     def mock_query(*args: Any, **kwargs: Any) -> Any:
         nonlocal count
@@ -203,3 +204,149 @@ async def test_async_query_for_ptrs_chunked() -> None:
     assert response[0].name == "name1"  # type: ignore
     assert response[1] is None
     assert response[2].name == "name3"  # type: ignore
+
+
+@pytest.mark.asyncio
+async def test_async_get_hostnames_no_results() -> None:
+    """Verify async_get_hostnames with no results."""
+    discover_hosts = discovery.DiscoverHosts()
+    net_data = SystemNetworkData(None, None)
+    net_data.router_ip = IPv4Address("192.168.0.1")
+    net_data.network = IPv4Network("192.168.0.0/24")
+    net_data.nameservers = [IPv4Address("172.0.0.3"), IPv4Address("172.0.0.4")]
+    with (
+        patch.object(
+            net_data,
+            "async_get_neighbours",
+            return_value={},
+        ),
+        patch("aiodiscover.discovery.async_query_for_ptrs", return_value={}),
+    ):
+        hostnames = await discover_hosts.async_get_hostnames(net_data)
+
+    assert hostnames == {}
+    # We should not add failed nameservers if we get no results
+    # since it could be a transient issue
+    assert discover_hosts._failed_nameservers == set()
+
+
+@pytest.mark.asyncio
+async def test_async_get_hostnames_all_responding() -> None:
+    """Verify async_get_hostnames with responses for all IPs."""
+    discover_hosts = discovery.DiscoverHosts()
+    net_data = SystemNetworkData(None, None)
+    net_data.router_ip = IPv4Address("192.168.0.1")
+    net_data.network = IPv4Network("192.168.0.0/24")
+    net_data.nameservers = [IPv4Address("172.0.0.3"), IPv4Address("172.0.0.4")]
+    hosts = list(net_data.network.hosts())
+    subnet_size = len(hosts)
+    with (
+        patch.object(
+            net_data,
+            "async_get_neighbours",
+            return_value={},
+        ),
+        patch(
+            "aiodiscover.discovery.async_query_for_ptrs",
+            return_value=[MockReply(name="xyz.org")] * subnet_size,
+        ),
+    ):
+        hostnames = await discover_hosts.async_get_hostnames(net_data)
+
+    assert hostnames == {str(ip): "xyz" for ip in hosts}
+    assert discover_hosts._failed_nameservers == set()
+
+
+@pytest.mark.asyncio
+async def test_async_get_hostnames_partial_responding() -> None:
+    """Verify async_get_hostnames with responses for some IPs."""
+    discover_hosts = discovery.DiscoverHosts()
+    net_data = SystemNetworkData(None, None)
+    net_data.router_ip = IPv4Address("192.168.0.1")
+    net_data.network = IPv4Network("192.168.0.0/31")
+    net_data.nameservers = [IPv4Address("172.0.0.3"), IPv4Address("172.0.0.4")]
+    hosts = list(net_data.network.hosts())
+    subnet_size = len(hosts)
+    assert subnet_size == 2
+    with (
+        patch.object(
+            net_data,
+            "async_get_neighbours",
+            return_value={},
+        ),
+        patch(
+            "aiodiscover.discovery.async_query_for_ptrs",
+            return_value=[MockReply(name="xyz.org"), None],
+        ),
+    ):
+        hostnames = await discover_hosts.async_get_hostnames(net_data)
+
+    assert hostnames == {
+        "192.168.0.0": "xyz",
+    }
+    assert discover_hosts._failed_nameservers == set()
+
+
+@pytest.mark.asyncio
+async def test_async_get_hostnames_first_nameserver_fails() -> None:
+    """Verify async_get_hostnames when the first nameserver fails."""
+    discover_hosts = discovery.DiscoverHosts()
+    net_data = SystemNetworkData(None, None)
+    net_data.router_ip = IPv4Address("192.168.0.1")
+    net_data.network = IPv4Network("192.168.0.0/31")
+    net_data.nameservers = [IPv4Address("172.0.0.3"), IPv4Address("172.0.0.4")]
+    hosts = list(net_data.network.hosts())
+    subnet_size = len(hosts)
+
+    queries: list[tuple[str, list[IPv4Address]]] = []
+
+    async def _mock_query_for_ptrs(
+        nameserver: str, ips_to_lookup: list[IPv4Address]
+    ) -> Any:
+        queries.append((nameserver, ips_to_lookup))
+        if nameserver == str(IPv4Address("172.0.0.4")):
+            return [MockReply(name="xyz.org")] * subnet_size
+        return [] * subnet_size
+
+    with (
+        patch.object(
+            net_data,
+            "async_get_neighbours",
+            return_value={},
+        ),
+        patch("aiodiscover.discovery.async_query_for_ptrs", _mock_query_for_ptrs),
+    ):
+        hostnames = await discover_hosts.async_get_hostnames(net_data)
+
+        assert queries == [
+            (str(IPv4Address("172.0.0.3")), hosts),
+            (str(IPv4Address("172.0.0.4")), hosts),
+        ]
+
+        assert hostnames == {str(ip): "xyz" for ip in hosts}
+        assert discover_hosts._failed_nameservers == {IPv4Address("172.0.0.3")}
+
+        queries.clear()
+        # Now run again, and we should remember the failed nameserver
+        hostnames = await discover_hosts.async_get_hostnames(net_data)
+
+        assert queries == [
+            (str(IPv4Address("172.0.0.4")), hosts),
+        ]
+
+        assert hostnames == {str(ip): "xyz" for ip in hosts}
+        assert discover_hosts._failed_nameservers == {IPv4Address("172.0.0.3")}
+
+        discover_hosts._failed_nameservers.clear()
+        queries.clear()
+
+        # Now run again, after clearing the failed nameservers
+        hostnames = await discover_hosts.async_get_hostnames(net_data)
+
+        assert queries == [
+            (str(IPv4Address("172.0.0.3")), hosts),
+            (str(IPv4Address("172.0.0.4")), hosts),
+        ]
+
+        assert hostnames == {str(ip): "xyz" for ip in hosts}
+        assert discover_hosts._failed_nameservers == {IPv4Address("172.0.0.3")}
