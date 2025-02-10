@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Iterable
 from contextlib import suppress
 from functools import lru_cache, partial
-from ipaddress import IPv4Address, IPv6Address
 from itertools import islice
 from typing import TYPE_CHECKING, Any, cast
 
@@ -14,6 +12,9 @@ from aiodns import DNSResolver
 from .network import SystemNetworkData
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+    from ipaddress import IPv4Address, IPv6Address
+
     from pyroute2.iproute import IPRoute
 
 HOSTNAME = "hostname"
@@ -51,7 +52,8 @@ def dns_message_short_hostname(dns_message: Any | None) -> str | None:
 
 
 async def async_query_for_ptrs(
-    nameserver: str, ips_to_lookup: list[IPv4Address]
+    nameserver: str,
+    ips_to_lookup: list[IPv4Address],
 ) -> list[Any | None]:
     """Fetch PTR records for a list of ips."""
     resolver = DNSResolver(nameservers=[nameserver], timeout=DNS_RESPONSE_TIMEOUT)
@@ -125,7 +127,8 @@ class DiscoverHosts:
         """Discover hosts on the network by ARP and PTR lookup."""
         if not self._sys_network_data:
             self._sys_network_data = await self._loop.run_in_executor(
-                None, self._setup_sys_network_data
+                None,
+                self._setup_sys_network_data,
             )
         sys_network_data = self._sys_network_data
         network = sys_network_data.network
@@ -150,7 +153,8 @@ class DiscoverHosts:
         ]
 
     async def _async_get_nameservers(
-        self, net_data: SystemNetworkData
+        self,
+        net_data: SystemNetworkData,
     ) -> list[IPv4Address | IPv6Address]:
         """Get nameservers to query."""
         if (
@@ -167,7 +171,8 @@ class DiscoverHosts:
         return net_data.nameservers
 
     async def async_get_hostnames(
-        self, sys_network_data: SystemNetworkData
+        self,
+        sys_network_data: SystemNetworkData,
     ) -> dict[str, str]:
         """Lookup PTR records for all addresses in the network."""
         all_nameservers = await self._async_get_nameservers(sys_network_data)

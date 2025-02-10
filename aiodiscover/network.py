@@ -4,7 +4,6 @@ import asyncio
 import re
 import socket
 import sys
-from collections.abc import Iterable
 from contextlib import suppress
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, ip_network
 from typing import TYPE_CHECKING, Any
@@ -16,6 +15,8 @@ from ifaddr import Adapter
 from .util import asyncio_timeout
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pyroute2.iproute import IPRoute
 # Some MAC addresses will drop the leading zero so
 # our mac validation must allow a single char
@@ -109,7 +110,7 @@ def get_attrs_key(data: Any, key: Any) -> str | None:
 def get_router_ip(ipr: IPRoute) -> IPv4Address | None:
     """Obtain the router ip from the default route."""
     return cached_ip_addresses(
-        get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY")
+        get_attrs_key(ipr.get_default_routes()[0], "RTA_GATEWAY"),
     )
 
 
@@ -137,10 +138,8 @@ def async_populate_arp(ip_addresses: Iterable[str]) -> socket.socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
     sock.setblocking(False)
     for ip_addr in ip_addresses:
-        try:
+        with suppress(Exception):
             sock.sendto(b"", (ip_addr, 80))
-        except Exception:
-            pass
     return sock
 
 
@@ -182,17 +181,15 @@ class SystemNetworkData:
         assert self.local_ip is not None
         self.network = get_network(self.local_ip, self.adapters)
         if self.ip_route:
-            try:
+            with suppress(Exception):
                 self.router_ip = get_router_ip(self.ip_route)
-            except Exception:
-                pass
         if not self.router_ip:
             # On MacOS netifaces is the only reliable way to get the default gateway
             with suppress(Exception):
                 import netifaces  # type: ignore # pylint: disable=import-outside-toplevel
 
                 self.router_ip = cached_ip_addresses(
-                    netifaces.gateways()["default"][netifaces.AF_INET][0]
+                    netifaces.gateways()["default"][netifaces.AF_INET][0],
                 )
         if not self.router_ip:
             network_address = str(self.network.network_address)
