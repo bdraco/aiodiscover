@@ -3,6 +3,9 @@ import pprint
 
 from aiodiscover import DiscoverHosts
 
-discover_hosts = DiscoverHosts()
-hosts = asyncio.run(discover_hosts.async_discover())
-pprint.pprint(hosts)
+
+async def run() -> None:
+    pprint.pprint(DiscoverHosts().async_discover())
+
+
+asyncio.run(run())
