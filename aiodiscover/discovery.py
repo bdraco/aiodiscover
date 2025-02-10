@@ -147,7 +147,7 @@ class DiscoverHosts:
             # And the router responds to ARP
             and str(router_ip) in await net_data.async_get_neighbours([str(router_ip)])
         ):
-            return [router_ip, *net_data.nameservers]
+            return [*net_data.nameservers, router_ip]
         return net_data.nameservers
 
     async def async_get_hostnames(
