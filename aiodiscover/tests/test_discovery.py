@@ -140,9 +140,9 @@ async def test_nameservers_includes_router_no_in_network_nameserver() -> None:
         return_value={"192.168.0.1": "AA:BB:CC:DD:EE:FF"},
     ):
         assert await discover_hosts._async_get_nameservers(net_data) == [
-            IPv4Address("192.168.0.1"),
             IPv4Address("172.0.0.3"),
             IPv4Address("172.0.0.4"),
+            IPv4Address("192.168.0.1"),
         ]
 
 
