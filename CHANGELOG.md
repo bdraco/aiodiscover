@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v2.6.0 (2025-02-10)
+
+### Features
+
+- Add cache of failed nameservers ([#126](https://github.com/bdraco/aiodiscover/pull/126),
+  [`b60a501`](https://github.com/bdraco/aiodiscover/commit/b60a501fd74af48bd3492d58750d4dd44014da08))
+
+
 ## v2.5.0 (2025-02-10)
 
 ### Features
