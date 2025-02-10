@@ -171,6 +171,9 @@ class DiscoverHosts:
     ) -> dict[str, str]:
         """Lookup PTR records for all addresses in the network."""
         all_nameservers = await self._async_get_nameservers(sys_network_data)
+        _LOGGER.debug("Using nameservers %s", all_nameservers)
+        _LOGGER.debug("Using network %s", sys_network_data.network)
+        _LOGGER.debug("Previous failed nameservers %s", self._failed_nameservers)
         ips = list(sys_network_data.network.hosts())
         hostnames: dict[str, str] = {}
         failed_nameservers_this_run: set[IPv4Address | IPv6Address] = set()
@@ -193,6 +196,7 @@ class DiscoverHosts:
                 # As soon as we have a responsive nameserver, there
                 # is no need to query additional fallbacks
                 break
+        _LOGGER.debug("Failed nameservers this run %s", failed_nameservers_this_run)
         if hostnames:
             # If we have any working nameservers, keep track of which
             # ones failed this run so we don't try them again
