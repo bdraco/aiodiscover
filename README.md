@@ -1,8 +1,8 @@
 # Async Host discovery
 
-[![Build Status](https://github.com/bdraco/aiodiscover/workflows/Build%20Main/badge.svg)](https://github.com/bdraco/aiodiscover/actions)
-[![Documentation](https://github.com/bdraco/aiodiscover/workflows/Documentation/badge.svg)](https://bdraco.github.io/aiodiscover/)
-[![Code Coverage](https://codecov.io/gh/bdraco/aiodiscover/branch/main/graph/badge.svg)](https://codecov.io/gh/bdraco/aiodiscover)
+[![Build Status](https://github.com/bluetooth-devices/aiodiscover/workflows/Build%20Main/badge.svg)](https://github.com/bluetooth-devices/aiodiscover/actions)
+[![Documentation](https://github.com/bluetooth-devices/aiodiscover/workflows/Documentation/badge.svg)](https://bluetooth-devices.github.io/aiodiscover/)
+[![Code Coverage](https://codecov.io/gh/bluetooth-devices/aiodiscover/branch/main/graph/badge.svg)](https://codecov.io/gh/bluetooth-devices/aiodiscover)
 
 Discover hosts by arp and ptr lookup
 
@@ -27,11 +27,11 @@ pprint.pprint(hosts)
 ## Installation
 
 **Stable Release:** `pip install aiodiscover`<br>
-**Development Head:** `pip install git+https://github.com/bdraco/aiodiscover.git`
+**Development Head:** `pip install git+https://github.com/bluetooth-devices/aiodiscover.git`
 
 ## Documentation
 
-For full package documentation please visit [bdraco.github.io/aiodiscover](https://bdraco.github.io/aiodiscover).
+For full package documentation please visit [bluetooth-devices.github.io/aiodiscover](https://bluetooth-devices.github.io/aiodiscover).
 
 ## Development
 
@@ -76,11 +76,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the
     everything else will be handled for you.
 - Ensure that you have set GitHub pages to build the `gh-pages` branch by selecting the
   `gh-pages` branch in the dropdown in the "GitHub Pages" section of the repository settings.
-  ([Repo Settings](https://github.com/bdraco/aiodiscover/settings))
+  ([Repo Settings](https://github.com/bluetooth-devices/aiodiscover/settings))
 - Register your project with PyPI:
   - Make an account on [pypi.org](https://pypi.org)
   - Go to your GitHub repository's settings and under the
-    [Secrets tab](https://github.com/bdraco/aiodiscover/settings/secrets/actions),
+    [Secrets tab](https://github.com/bluetooth-devices/aiodiscover/settings/secrets/actions),
     add a secret called `PYPI_TOKEN` with your password for your PyPI account.
     Don't worry, no one will see this password because it will be encrypted.
   - Next time you push to the branch `main` after using `bump2version`, GitHub

@@ -9,10 +9,10 @@ requires-python = ">=3.9"
 dynamic = ["classifiers", "dependencies", "optional-dependencies"]
 
 [project.urls]
-"Repository" = "https://github.com/bdraco/aiodiscover"
+"Repository" = "https://github.com/bluetooth-devices/aiodiscover"
 "Documentation" = "https://aiodiscover.readthedocs.io"
-"Bug Tracker" = "https://github.com/bdraco/aiodiscover/issues"
-"Changelog" = "https://github.com/bdraco/aiodiscover/blob/main/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/bluetooth-devices/aiodiscover/issues"
+"Changelog" = "https://github.com/bluetooth-devices/aiodiscover/blob/main/CHANGELOG.md"
 
 [tool.poetry]
 classifiers = [
