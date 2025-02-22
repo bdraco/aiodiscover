@@ -32,13 +32,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/bdraco/aiodiscover
+    $ git clone git://github.com/bluetooth-devices/aiodiscover
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/bdraco/aiodiscover/tarball/main
+    $ curl  -OL https://github.com/bluetooth-devices/aiodiscover/tarball/main
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/bdraco/aiodiscover
-.. _tarball: https://github.com/bdraco/aiodiscover/tarball/main
+.. _Github repo: https://github.com/bluetooth-devices/aiodiscover
+.. _tarball: https://github.com/bluetooth-devices/aiodiscover/tarball/main
